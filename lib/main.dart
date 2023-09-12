@@ -29,6 +29,30 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
+
+        //Initialize Firebase here.
+        /*
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "firebase/app";
+        import { getAnalytics } from "firebase/analytics";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyBh6-v_Es-2lzOza_yLmsQu_mkb-3FQOgc",
+          authDomain: "groupfly-a90ae.firebaseapp.com",
+          projectId: "groupfly-a90ae",
+          storageBucket: "groupfly-a90ae.appspot.com",
+          messagingSenderId: "1026053522641",
+          appId: "1:1026053522641:web:fd9695400a1e6bc024f1f0",
+          measurementId: "G-RYVM2H3TF5"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);*/
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
