@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/general_profile_widget.dart';
 
-import '../../../models/group_fly_user.dart';
+import '../../models/group_fly_user.dart';
 
-class ProfileSearchResultContainer extends StatefulWidget{
+class ListedProfileContainer extends StatefulWidget{
   GroupFlyUser profile;
-  ProfileSearchResultContainer({required this.profile});
+  ListedProfileContainer({required this.profile});
   @override
-  State<ProfileSearchResultContainer> createState() => _ProfileSearchResultContainerState();
+  State<ListedProfileContainer> createState() => _ListedProfileContainerState();
 }
-class _ProfileSearchResultContainerState extends State<ProfileSearchResultContainer>{
+class _ListedProfileContainerState extends State<ListedProfileContainer>{
   //TODO: make little card that would display a bottom sheet with the user profile
   @override
   Widget build(BuildContext context){

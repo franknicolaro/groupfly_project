@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 import 'package:groupfly_project/widgets/ExplorerWidgets/profile_explorer_widget.dart';
+import 'package:groupfly_project/widgets/GroupWidgets/group_navigation_widget.dart';
 
 import '../models/group_fly_user.dart';
 import '../screens/profile_screen.dart';
@@ -17,7 +18,7 @@ class AppController extends StatefulWidget {
 class _AppControllerState extends State<AppController>{
   Authorization _auth = Authorization();
   Widget profileExplorer = ProfileExplorerWidget();
-  Widget pageTwo = Text("2: TODO: Implement Group Navigation");
+  Widget groupNavigation = GroupNavigationWidget();//Text("2: TODO: Implement Group Navigation");
   Widget pageThree = Text("3: TODO: Implement Home Page with User Feed");
   Widget? currentProfilePage;
   GroupFlyUser? currentUser;
@@ -59,13 +60,12 @@ class _AppControllerState extends State<AppController>{
         index: _currentPageIndex,
         children: [
           profileExplorer,
-          pageTwo,
+          groupNavigation,
           pageThree,
           currentProfilePage == null ? Text("not yet loaded") : currentProfilePage!
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.green,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
         showUnselectedLabels: true,

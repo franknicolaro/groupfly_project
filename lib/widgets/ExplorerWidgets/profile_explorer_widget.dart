@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
-import 'package:groupfly_project/widgets/ExplorerWidgets/SearchResultWidgets/profile_search_result_container.dart';
+import 'package:groupfly_project/widgets/ProfileWidgets/listed_profile_container.dart';
 
 import '../../services/repository_service.dart';
 
@@ -59,7 +59,7 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
                 child: Column(
                   children:
                     profiles.map((profile) =>
-                      ProfileSearchResultContainer(profile: profile)
+                      ListedProfileContainer(profile: profile)
                     ).toList(),
                 )
               ),
