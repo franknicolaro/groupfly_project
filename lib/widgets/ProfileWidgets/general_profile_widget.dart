@@ -1,62 +1,58 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:groupfly_project/models/group_fly_user.dart';
-import 'package:groupfly_project/services/authorization_service.dart';
-import 'package:groupfly_project/services/repository_service.dart';
-import 'package:groupfly_project/widgets/ProfileWidgets/ProfileLabels/number_of_groups_label.dart';
-import 'package:groupfly_project/widgets/ProfileWidgets/ProfileLabels/username_label.dart';
-import 'package:groupfly_project/widgets/ProfileWidgets/general_profile_widget.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/post_creation_group_container.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/profile_picture.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/user_post_list_widget.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../models/Group.dart';
 import '../../models/Post.dart';
+import '../../models/group_fly_user.dart';
+import '../../services/authorization_service.dart';
+import '../../services/repository_service.dart';
 import 'ProfileLabels/friend_count_label.dart';
+import 'ProfileLabels/number_of_groups_label.dart';
 import 'ProfileLabels/number_of_posts_label.dart';
+import 'ProfileLabels/username_label.dart';
 
-class UserProfileWidgetWeb extends StatefulWidget {
+class GeneralProfileWidget extends StatefulWidget{
   GroupFlyUser user;
-  UserProfileWidgetWeb({required this.user});
+  GeneralProfileWidget({required this.user});
   @override
-  State<UserProfileWidgetWeb> createState() => _UserProfileWidgetWebState();
+  State<GeneralProfileWidget> createState() => _GeneralProfileWidgetState();
 }
 
-class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
+class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
+  Authorization _auth = Authorization();
+  FirebaseStorage storage = FirebaseStorage.instance;
+  PickedFile? _imageFile;
+  final ImagePicker _imagePicker = ImagePicker();
+  var selectedFile;
+  Group? selectedGroup;
+  var _newPostController = TextEditingController();
+  XFile? fileToPost;
+  String? userName;
+  List<Post> posts = [];
+  String? tempUrl;
+  List<Group> groups = [];
   @override
   void initState(){
     super.initState();
+    initPosts();
+    initGroups();
   }
   @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 10, 70, 94),
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 61, 111, 67),
-        title: Text('User Profile'),
-        actions:[
-          TextButton.icon(
-            onPressed:(){
-              //Display notifications widget
-            },
-            icon: const Icon(Icons.add_alert_sharp),
-            label: const Text("Notifications")
-          )
-        ]
-      ),
-      body: GeneralProfileWidget(user: widget.user)/*Container(
+  Widget build(BuildContext context) {
+    return Container(
         child: Column(
           children: [
             Center(
               child: Stack(
                 children: <Widget>[
                   ProfilePictureWidget(
-                    imageUrl: widget.user.photoURL == null ? "https://images.vexels.com/media/users/3/180861/isolated/preview/f68f0a8f6f1901015166ae2f9d8a39f8-cute-ladybug-flying-outline.png" : widget.user.photoURL!,
+                    imageUrl: widget.user.photoURL == null || widget.user.photoURL! == "" ? "https://images.vexels.com/media/users/3/180861/isolated/preview/f68f0a8f6f1901015166ae2f9d8a39f8-cute-ladybug-flying-outline.png" : widget.user.photoURL!,
                   ),
                   Visibility(
                     visible: widget.user.uid == _auth.currentUser!.uid,
@@ -94,6 +90,8 @@ class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
                 ]
               )
             ),
+            //TODO:Change this visibility to instead be an Add Friend or Create a new post button, depending on who is the user in this profile
+            //e.g. widget.user.uid == _auth.currentUser!.uid
             Visibility(
               visible: widget.user.uid == _auth.currentUser!.uid,
               child: ElevatedButton(
@@ -119,10 +117,9 @@ class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
             */
           ]
         ),
-      ),*/
-    );
+      );
   }
-  /*void initGroups(){
+  void initGroups(){
     GetIt.instance<RepositoryService>().getGroupsByMemberUID(widget.user.uid!).then((value) {
       setState(() {
         groups = value;
@@ -302,5 +299,5 @@ class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
         ],
       )
     );
-  }*/
+  }
 }

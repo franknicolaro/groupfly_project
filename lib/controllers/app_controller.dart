@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/services/authorization_service.dart';
+import 'package:groupfly_project/widgets/ExplorerWidgets/profile_explorer_widget.dart';
 
+import '../models/group_fly_user.dart';
 import '../screens/profile_screen.dart';
+import '../services/repository_service.dart';
 
 class AppController extends StatefulWidget {
   const AppController({super.key});
@@ -10,26 +15,36 @@ class AppController extends StatefulWidget {
 }
 
 class _AppControllerState extends State<AppController>{
-  Widget pageOne = Text("1: TODO: Implement Profile Explorer");
+  Authorization _auth = Authorization();
+  Widget profileExplorer = ProfileExplorerWidget();
   Widget pageTwo = Text("2: TODO: Implement Group Navigation");
   Widget pageThree = Text("3: TODO: Implement Home Page with User Feed");
-  Widget profilePage = ProfileScreen();//Text("4: TODO: Implement Account Navigation");
+  Widget? currentProfilePage;
+  GroupFlyUser? currentUser;
   int? _currentPageIndex;
   final int DEFAULT_PAGE = 2;
 
   @override
   void initState(){
     super.initState();
+    initUser();
     _currentPageIndex = DEFAULT_PAGE;
+  }
+
+  void initUser() {
+    GetIt.instance<RepositoryService>().getGroupFlyUserByUID(_auth.currentUser!.uid).then((value) {
+      setState(() {
+        currentProfilePage = ProfileScreen(user: value);
+      });
+    },);
   }
   @override
   Widget build(BuildContext context) {
     /*TODO: Cases:
     *   1: Home page
     *     a: User feed
-    *   2: Account/Profile Navigation
+    *   2: Account/Profile Navigation 
     *     a: Settings page within account tab
-    *     b: profile with posts
     *     c: friends page
     *   3: Group Navigation
     *     a: Group Explorer
@@ -37,19 +52,20 @@ class _AppControllerState extends State<AppController>{
     *   4: Notifications Widget
     *     a: displaying all notifications
     *     b: Accept invite/request pages(widgets?)
-    *   5: Profile Explorer 
+    *   5: Profile Explorer XXX
     */
     return Scaffold(
       body: IndexedStack(
         index: _currentPageIndex,
         children: [
-          pageOne,
+          profileExplorer,
           pageTwo,
           pageThree,
-          profilePage
+          currentProfilePage == null ? Text("not yet loaded") : currentProfilePage!
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.green,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
         showUnselectedLabels: true,

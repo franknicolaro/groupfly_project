@@ -6,7 +6,8 @@ import '../../../services/authorization_service.dart';
 import '../../../services/repository_service.dart';
 
 class UsernameLabel extends StatefulWidget{
-
+  GroupFlyUser user;
+  UsernameLabel({required this.user});
   @override
   State<UsernameLabel> createState() => _UsernameLabelState();
 }
@@ -21,7 +22,7 @@ class _UsernameLabelState extends State<UsernameLabel>{
     initUser();
   }
   void initUser() {
-    user = GetIt.instance<RepositoryService>().getGroupFlyUserByUID(_auth.currentUser!.uid);
+    user = GetIt.instance<RepositoryService>().getGroupFlyUserByUID(widget.user.uid!);
   }
   @override
   Widget build(BuildContext context){

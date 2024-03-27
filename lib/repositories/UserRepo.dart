@@ -19,6 +19,27 @@ class UserRepo implements UserDao{
     result = documentSnapshot.data();
     return result!;
   }
+  @override
+  Future<List<GroupFlyUser>> searchProfileByName(String name) async{
+    List<GroupFlyUser> profiles = [];
+    CollectionReference users = firebaseDB.collection('user');
+    await users.where('username', isEqualTo: name).get().then((result) {
+      if(result.docs.isNotEmpty){
+        profiles = List.generate(result.docs.length, (i){
+          return GroupFlyUser(
+            uid: result.docs[i].id,
+            email: result.docs[i]['email'],
+            address: result.docs[i]['address'],
+            dateOfBirth: (result.docs[i]['date_of_birth'] as Timestamp).toDate(),
+            photoURL: result.docs[i]['photo_url'],
+            username: result.docs[i]['username']
+          );
+        });
+      }
+    },);
+    //print(profiles[0].username);
+    return profiles;
+  }
 
   @override
   Future<void> insertGroupFlyUser(String email, String address, DateTime? dateOfBirth, String username) {
@@ -27,10 +48,13 @@ class UserRepo implements UserDao{
       'email': email,
       'address': address,
       'date_of_birth': dateOfBirth,
-      'username': username
+      'username': username,
+      'photo_url': null,
     })
     .then((value) => print("User added at id ${_auth.currentUser!.uid}."))
     .catchError((error) => print("Error occurred while adding user: $error"));
   }
+  
+  
   
 }

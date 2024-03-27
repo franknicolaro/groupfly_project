@@ -3,9 +3,12 @@ import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/services/repository_service.dart';
 
 import '../../../models/Friend.dart';
+import '../../../models/group_fly_user.dart';
 import '../../../services/authorization_service.dart';
 
 class FriendCountLabel extends StatefulWidget{
+  GroupFlyUser user;
+  FriendCountLabel({required this.user});
   @override
   State<FriendCountLabel> createState() => _FriendCountLabelState();
 }
@@ -21,7 +24,7 @@ class _FriendCountLabelState extends State<FriendCountLabel>{
   }
 
   void initFriends(){
-    friends = GetIt.instance<RepositoryService>().getFriendsByUID(_auth.currentUser!.uid);
+    friends = GetIt.instance<RepositoryService>().getFriendsByUID(widget.user.uid!);
   }
 
   @override

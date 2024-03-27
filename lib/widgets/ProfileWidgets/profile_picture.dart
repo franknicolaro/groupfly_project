@@ -1,8 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-
-import '../../services/authorization_service.dart';
 
 class ProfilePictureWidget extends StatefulWidget{
 
@@ -14,7 +10,6 @@ class ProfilePictureWidget extends StatefulWidget{
 }
 
 class _ProfilePictureWidgetState extends State<ProfilePictureWidget>{
-  Authorization _auth = Authorization();
   @override
   Widget build(BuildContext context){
     return CircleAvatar(

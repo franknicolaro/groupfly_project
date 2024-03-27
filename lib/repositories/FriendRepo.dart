@@ -12,7 +12,7 @@ class FriendRepo implements FriendDao{
   Future<List<Friend>> getFriendsByUID(String uid) async{
     CollectionReference friendCollection = firebaseDB.collection('friends');
     List<Friend> friends = [];
-    await friendCollection.where('uid', isEqualTo: _auth.currentUser!.uid).get().then((result){
+    await friendCollection.where('uid', isEqualTo: uid).get().then((result){
       if(result.docs.isNotEmpty){
         friends = List.generate(result.docs.length, (i){
           return Friend(

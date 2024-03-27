@@ -7,6 +7,7 @@ import 'package:groupfly_project/models/group_fly_user.dart';
 import 'package:groupfly_project/repositories/FriendRepo.dart';
 import 'package:groupfly_project/repositories/GroupRepo.dart';
 import 'package:groupfly_project/repositories/HobbyRepo.dart';
+import 'package:groupfly_project/repositories/PostRepo.dart';
 import 'package:groupfly_project/repositories/UserRepo.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 import 'package:groupfly_project/controller_selector.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 
 import 'DAOs/GroupDAO.dart';
+import 'DAOs/PostDAO.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -25,6 +27,7 @@ Future<void> main() async {
   GetIt.instance.registerLazySingleton<HobbyDao>(() => HobbyRepo());
   GetIt.instance.registerLazySingleton<FriendDao>(() => FriendRepo());
   GetIt.instance.registerLazySingleton<GroupDao>(() => GroupRepo());
+  GetIt.instance.registerLazySingleton<PostDao>(() => PostRepo());
   runApp(const MyApp());
 }
 
