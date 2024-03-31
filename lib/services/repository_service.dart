@@ -17,6 +17,7 @@ abstract class RepositoryService{
   Future<GroupFlyUser> getGroupFlyUserByUID(String uid);
   Future<void> insertGroupFlyUser(String email, String password, DateTime? dateOfBirth, String username);
   Future<void> insertHobbies(List<Hobby> selectedHobbies);
+  List<Hobby> getAllHobbies();
   Future<List<Friend>>getFriendsByUID(String uid);
   Future<List<Group>>getGroupsByMemberUID(String memberUID);
   Future<List<Post>>getPostsByUID(String uid);
@@ -26,6 +27,7 @@ abstract class RepositoryService{
   Future<void> addComment(GroupFlyUser user, String text, String postId);
   Future<void> insertPost(Post post);
   Future<List<GroupFlyUser>> searchProfileByName(String name);
+  Future<List<Group>> searchGroupsByName(String title);
 }
 
 class RepositoryServiceImpl implements RepositoryService{
@@ -86,5 +88,15 @@ class RepositoryServiceImpl implements RepositoryService{
   @override
   Future<List<GroupFlyUser>> searchProfileByName(String name) {
     return GetIt.instance<UserDao>().searchProfileByName(name);
+  }
+  
+  @override
+  Future<List<Group>> searchGroupsByName(String title) {
+    return GetIt.instance<GroupDao>().searchGroupsByName(title);
+  }
+  
+  @override
+  List<Hobby> getAllHobbies() {
+    return GetIt.instance<HobbyDao>().getAllHobbies();
   }
 }

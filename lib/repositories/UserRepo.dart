@@ -37,7 +37,6 @@ class UserRepo implements UserDao{
         });
       }
     },);
-    //print(profiles[0].username);
     return profiles;
   }
 

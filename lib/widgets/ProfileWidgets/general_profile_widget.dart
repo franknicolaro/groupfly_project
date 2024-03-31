@@ -37,17 +37,30 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
   List<Post> posts = [];
   String? tempUrl;
   List<Group> groups = [];
+  late bool isProfileOfCurrentUser;
   @override
   void initState(){
     super.initState();
     initPosts();
     initGroups();
+    isProfileOfCurrentUser = widget.user.uid == _auth.currentUser!.uid;
   }
   @override
   Widget build(BuildContext context) {
     return Container(
         child: Column(
           children: [
+            Visibility(
+              visible: !isProfileOfCurrentUser,
+              child: Container(
+                alignment: Alignment.topLeft,
+                child: BackButton(
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                )
+              )
+            ),
             Center(
               child: Stack(
                 children: <Widget>[
@@ -55,7 +68,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
                     imageUrl: widget.user.photoURL == null || widget.user.photoURL! == "" ? "https://images.vexels.com/media/users/3/180861/isolated/preview/f68f0a8f6f1901015166ae2f9d8a39f8-cute-ladybug-flying-outline.png" : widget.user.photoURL!,
                   ),
                   Visibility(
-                    visible: widget.user.uid == _auth.currentUser!.uid,
+                    visible: isProfileOfCurrentUser,
                     child: Positioned(
                       bottom: 20,
                       right: 20,
@@ -93,7 +106,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
             //TODO:Change this visibility to instead be an Add Friend or Create a new post button, depending on who is the user in this profile
             //e.g. widget.user.uid == _auth.currentUser!.uid
             Visibility(
-              visible: widget.user.uid == _auth.currentUser!.uid,
+              visible: isProfileOfCurrentUser,
               child: ElevatedButton(
                 onPressed: (){
                   showModalBottomSheet(
@@ -171,6 +184,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
   }
   Widget postPopUp(){
     return Container(
+      color: Color.fromARGB(255, 17, 127, 171),
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       child: Column(
@@ -212,7 +226,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
               )
             ]
           ),
-          Text(selectedGroup == null ? "Select a group that this is in reference to:" : "Group seleced: ${selectedGroup!.title}",
+          Text(selectedGroup == null ? "Select a group that this is in reference to (Shift + scroll if using a mouse):" : "Group seleced: ${selectedGroup!.title}",
             style: TextStyle(
               fontSize: 24
             )
@@ -247,6 +261,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
           ElevatedButton(
             onPressed: () {
               setState(() {
+                //TODO: add errors if user hasn't selected a photo or group.
                 DocumentReference refToGroup = FirebaseFirestore.instance.doc("group/${selectedGroup!.group_id}");
                 uploadPostImageAndAddPost(refToGroup);
                 Navigator.pop(context);

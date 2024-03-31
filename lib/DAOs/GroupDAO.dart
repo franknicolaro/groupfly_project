@@ -5,4 +5,5 @@ import '../models/Group.dart';
 abstract class GroupDao{
   Future<List<Group>> getGroupsByMemberUID(String memberUID);
   Future<Group> getGroupByPostReference(DocumentReference groupRef);
+  Future<List<Group>> searchGroupsByName(String title);
 }

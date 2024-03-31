@@ -28,8 +28,6 @@ class _VerificationWidgetWebState extends State<VerificationWidgetWeb>{
   void initState(){
     super.initState();
     user = _auth.currentUser;
-    print("User id: ${user!.uid}");
-    //user?.sendEmailVerification();
     timer = Timer.periodic(
       const Duration(seconds: 10),
       (timer){

@@ -10,12 +10,12 @@ class ListedProfileContainer extends StatefulWidget{
   State<ListedProfileContainer> createState() => _ListedProfileContainerState();
 }
 class _ListedProfileContainerState extends State<ListedProfileContainer>{
-  //TODO: make little card that would display a bottom sheet with the user profile
   @override
   Widget build(BuildContext context){
     return OutlinedButton(
       onPressed: (){
         showModalBottomSheet(
+          isScrollControlled: true,
           context: context, 
           builder: ((builder) => displayUserProfile())
         );

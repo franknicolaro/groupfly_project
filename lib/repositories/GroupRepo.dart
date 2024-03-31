@@ -21,7 +21,9 @@ class GroupRepo implements GroupDao{
             member_uids: List.from(result.docs[i]['members']),
             notes: result.docs[i]['other_notes'],
             title: result.docs[i]['title'],
-            meeting_time: result.docs[i]['meeting_time'].toDate()
+            meeting_time: result.docs[i]['meeting_time'].toDate(),
+            isActive: result.docs[i]['is_active'],
+            maxCapacity: result.docs[i]['max_capacity']
           );
         });
       }
@@ -38,5 +40,30 @@ class GroupRepo implements GroupDao{
     final snapshot = await ref.get();
     result = snapshot.data();
     return result!;
+  }
+  
+  @override
+  Future<List<Group>> searchGroupsByName(String title) async{
+    List<Group> groups = [];
+    CollectionReference groupRef = firebaseDB.collection('group');
+    await groupRef.where('title', isEqualTo: title).where('is_active', isEqualTo: true).get().then((result){
+      if(result.docs.isNotEmpty){
+        groups = List.generate(result.docs.length, (i){
+          return Group(
+            group_id: result.docs[i].id,
+            owner_uid: result.docs[i]['owneruid'],
+            title: result.docs[i]['title'],
+            hobbyName: result.docs[i]['hobby'],
+            location: result.docs[i]['location'],
+            notes: result.docs[i]['other_notes'],
+            member_uids: List.from(result.docs[i]['members']),
+            meeting_time: result.docs[i]['meeting_time'].toDate(),
+            isActive: result.docs[i]['is_active'],
+            maxCapacity: result.docs[i]['max_capacity']
+          );
+        });
+      }
+    });
+    return groups;
   }
 }

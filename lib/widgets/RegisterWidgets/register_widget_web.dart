@@ -25,22 +25,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
   String address = '';
   String username = '';
   DateTime? dateOfBirth;
-  static final List<Hobby> _selectableHobbies = [
-    Hobby(hobbyName: "Singing"),
-    Hobby(hobbyName: "Dancing"),
-    Hobby(hobbyName: "Football"),
-    Hobby(hobbyName: "Soccer"),
-    Hobby(hobbyName: "Baseball"),
-    Hobby(hobbyName: "Basketball"),
-    Hobby(hobbyName: "Bowling"),
-    Hobby(hobbyName: "Hiking"),
-    Hobby(hobbyName: "Frisbee"),
-    Hobby(hobbyName: "Swimming"),
-    Hobby(hobbyName: "Walking"),
-    Hobby(hobbyName: "Exercising"),
-    Hobby(hobbyName: "Cooking"),
-    Hobby(hobbyName: "Painting"),
-  ];
+  static final List<Hobby> _selectableHobbies = GetIt.instance<RepositoryService>().getAllHobbies();
 
   final _items = _selectableHobbies.map((hobby) => MultiSelectItem<Hobby>(hobby, hobby.hobbyName))
   .toList();
@@ -147,7 +132,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
               InputDatePickerFormField(
                 initialDate: DateTime.fromMillisecondsSinceEpoch(100),
                 firstDate: DateTime(1940),
-                lastDate: DateTime(2040),
+                lastDate: DateTime(DateTime.now().year),
                 errorFormatText: "Invalid Format",
                 errorInvalidText: "Invalid Date",
                 onDateSubmitted: (date) {
@@ -161,7 +146,6 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                   });
                 },
               ),
-              //TODO: Move this to another screen potentially.
               SizedBox(height: 20.0),
               const Text('Select Hobbies', style: TextStyle(
                   color: Colors.white,

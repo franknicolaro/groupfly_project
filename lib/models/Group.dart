@@ -10,8 +10,10 @@ class Group{
   final List<String> member_uids;
   final String notes;
   final DateTime meeting_time;
+  final bool isActive;
+  final int maxCapacity;
 
-  Group({required this.group_id, required this.owner_uid, required this.title, required this.hobbyName, required this.location, required this.notes, required this.member_uids, required this.meeting_time});
+  Group({required this.group_id, required this.owner_uid, required this.title, required this.hobbyName, required this.location, required this.notes, required this.member_uids, required this.meeting_time, required this.isActive, required this.maxCapacity});
 
   factory Group.fromDB(DocumentSnapshot<Map<String, dynamic>> snapshot,
   SnapshotOptions? options,){
@@ -25,6 +27,8 @@ class Group{
       notes: map?['other_notes'],
       member_uids: List.from(map?['members']),
       meeting_time: map?['meeting_time'].toDate(),
+      isActive: map?['is_active'],
+      maxCapacity: map?['max_capacity']
     );
   }
   
