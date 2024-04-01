@@ -9,20 +9,20 @@ class FriendRepo implements FriendDao{
   final _auth = Authorization();
 
   @override
-  Future<List<Friend>> getFriendsByUID(String uid) async{
+  Future<Friend> getFriendsByUID(String uid) async{
     CollectionReference friendCollection = firebaseDB.collection('friends');
     List<Friend> friends = [];
-    await friendCollection.where('uid', isEqualTo: uid).get().then((result){
+    await friendCollection.where('uid', isEqualTo: uid).get().then((result) {
       if(result.docs.isNotEmpty){
-        friends = List.generate(result.docs.length, (i){
+        friends = List.generate(result.docs.length, (i) {
           return Friend(
-            user_uid: uid,
-            friend_uid: result.docs[i]['frienduid']
+            friend_uids: List.from(result.docs[i]['frienduids']), 
+            user_uid: uid
           );
         });
       }
-    });
-    return friends;
+    },);
+    return friends[0];
   }
   
   

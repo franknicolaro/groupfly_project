@@ -18,12 +18,13 @@ class AppController extends StatefulWidget {
 class _AppControllerState extends State<AppController>{
   Authorization _auth = Authorization();
   Widget profileExplorer = ProfileExplorerWidget();
-  Widget groupNavigation = GroupNavigationWidget();//Text("2: TODO: Implement Group Navigation");
+  Widget groupNavigation = GroupNavigationWidget();
   Widget pageThree = Text("3: TODO: Implement Home Page with User Feed");
   Widget? currentProfilePage;
   GroupFlyUser? currentUser;
   int? _currentPageIndex;
   final int DEFAULT_PAGE = 2;
+  //TODO: get groups of user here.
 
   @override
   void initState(){
@@ -53,7 +54,6 @@ class _AppControllerState extends State<AppController>{
     *   4: Notifications Widget
     *     a: displaying all notifications
     *     b: Accept invite/request pages(widgets?)
-    *   5: Profile Explorer XXX
     */
     return Scaffold(
       body: IndexedStack(

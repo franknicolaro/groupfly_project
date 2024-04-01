@@ -7,10 +7,10 @@ class Group{
   final String title;
   final String hobbyName;
   final String location;
-  final List<String> member_uids;
+  List<String> member_uids;
   final String notes;
   final DateTime meeting_time;
-  final bool isActive;
+  bool isActive;
   final int maxCapacity;
 
   Group({required this.group_id, required this.owner_uid, required this.title, required this.hobbyName, required this.location, required this.notes, required this.member_uids, required this.meeting_time, required this.isActive, required this.maxCapacity});

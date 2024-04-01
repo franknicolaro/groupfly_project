@@ -19,7 +19,8 @@ import 'ProfileLabels/username_label.dart';
 
 class GeneralProfileWidget extends StatefulWidget{
   GroupFlyUser user;
-  GeneralProfileWidget({required this.user});
+  bool isFromGroupPage;
+  GeneralProfileWidget({required this.user, required this.isFromGroupPage});
   @override
   State<GeneralProfileWidget> createState() => _GeneralProfileWidgetState();
 }
@@ -48,10 +49,11 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
   @override
   Widget build(BuildContext context) {
     return Container(
+        color: Color.fromARGB(255, 10, 70, 94),
         child: Column(
           children: [
             Visibility(
-              visible: !isProfileOfCurrentUser,
+              visible: !isProfileOfCurrentUser || widget.isFromGroupPage,
               child: Container(
                 alignment: Alignment.topLeft,
                 child: BackButton(
@@ -103,8 +105,6 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
                 ]
               )
             ),
-            //TODO:Change this visibility to instead be an Add Friend or Create a new post button, depending on who is the user in this profile
-            //e.g. widget.user.uid == _auth.currentUser!.uid
             Visibility(
               visible: isProfileOfCurrentUser,
               child: ElevatedButton(

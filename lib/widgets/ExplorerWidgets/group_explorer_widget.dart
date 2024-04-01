@@ -19,6 +19,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
   String? hobbyFilter;
   String? locationFilter;
   DateTime? tempDate;
+  DateTime? tempDateToDisplay;
   String? selectedHobby;
   DateTime? meetingTimeFilter;
   late int maxCapacityFilter;
@@ -120,7 +121,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
               child: Column(
                 children:  
                   groups.map((group) =>
-                    ListedGroupContainer(group: group)
+                    group.isActive ? ListedGroupContainer(group: group) : Container()
                   ).toList(),
               ),
             )
@@ -199,7 +200,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                   onPressed: () async { 
                     tempDate = await _showDatePicker();
                     setState(() {
-                      
+                      tempDateToDisplay = tempDate;
                     });
                   },
                   child: const Text(
@@ -213,7 +214,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                   ),
                 ),
                 SizedBox(width: 15),
-                Text("Selected Date: ${tempDate != null ? tempDate.toString() : "None."}",
+                Text("Selected Date: ${tempDateToDisplay != null ? tempDateToDisplay.toString() : "None."}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,

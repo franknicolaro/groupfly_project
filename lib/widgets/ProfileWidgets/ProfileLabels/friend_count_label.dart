@@ -41,9 +41,9 @@ class _FriendCountLabelState extends State<FriendCountLabel>{
             );
           }
           else if(snapshot.hasData){
-            List<Friend> friendList = snapshot.data as List<Friend>;
+            Friend friendList = snapshot.data as Friend;
             return Text(
-              'Number of Friends: ${friendList.length}',
+              'Number of Friends: ${friendList.friend_uids.length}',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 18,

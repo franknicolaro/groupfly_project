@@ -7,6 +7,20 @@ class GroupRepo implements GroupDao{
   final FirebaseFirestore firebaseDB = FirebaseFirestore.instance;
 
   @override
+  Future<void> createGroup(Group group) async {
+    firebaseDB.collection('group').doc().set({
+      'hobby': group.hobbyName,
+      'is_active': group.isActive,
+      'location': group.location,
+      'max_capacity': group.maxCapacity,
+      'meeting_time': group.meeting_time,
+      'members': group.member_uids,
+      'other_notes': group.notes,
+      'owneruid': group.owner_uid,
+      'title': group.title,
+    }).onError((error, stackTrace) => "Error adding group to Firestore: $error");
+  }
+  @override
   Future<List<Group>> getGroupsByMemberUID(String memberUID) async{
     CollectionReference groupCollection = firebaseDB.collection('group');
     List<Group> groups = [];
@@ -66,4 +80,19 @@ class GroupRepo implements GroupDao{
     });
     return groups;
   }
+  
+  @override
+  Future<void> removeMember(String memberUID, String groupId)async {
+    firebaseDB.collection('group').doc(groupId).update({
+      'members': FieldValue.arrayRemove([memberUID])
+    });
+  }
+
+  @override
+  Future<void> disbandGroup(String groupId)async {
+    firebaseDB.collection('group').doc(groupId).update({
+      'is_active': false
+    });
+  }
+  
 }

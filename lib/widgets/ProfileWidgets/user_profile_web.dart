@@ -49,7 +49,7 @@ class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
           )
         ]
       ),
-      body: GeneralProfileWidget(user: widget.user)/*Container(
+      body: GeneralProfileWidget(user: widget.user, isFromGroupPage: false,)/*Container(
         child: Column(
           children: [
             Center(

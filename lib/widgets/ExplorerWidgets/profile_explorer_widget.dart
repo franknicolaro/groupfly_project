@@ -59,43 +59,14 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
                 child: Column(
                   children:
                     profiles.map((profile) =>
-                      ListedProfileContainer(profile: profile)
+                      ListedProfileContainer(profile: profile, isFromGroupPage: false,)
                     ).toList(),
                 )
               ),
             )
-                /*ElevatedButton(
-                  onPressed: (){
-                    showModalBottomSheet(
-                      context: context,
-                      builder: ((builder) => filtersPopUp())
-                    );
-                  }, 
-                  child: const Text('Filters',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Mulish'
-                    )
-                  )
-                )*/
           ]
         )
       )
     );
   }
-  /*TODO: SAVE THIS FOR GROUP EXPLORER
-  Widget filtersPopUp(){
-    return Container(
-      color: Color.fromARGB(255, 17, 127, 171),
-      height: MediaQuery.of(context).size.height * 0.35,
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: [
-
-        ]
-      )
-    );
-  }*/
 }

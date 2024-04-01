@@ -5,7 +5,8 @@ import '../../models/group_fly_user.dart';
 
 class ListedProfileContainer extends StatefulWidget{
   GroupFlyUser profile;
-  ListedProfileContainer({required this.profile});
+  bool isFromGroupPage;
+  ListedProfileContainer({required this.profile, required this.isFromGroupPage});
   @override
   State<ListedProfileContainer> createState() => _ListedProfileContainerState();
 }
@@ -60,7 +61,7 @@ class _ListedProfileContainerState extends State<ListedProfileContainer>{
   Widget displayUserProfile(){
     return Container(
       color: Color.fromARGB(255, 17, 127, 171),
-      child:GeneralProfileWidget(user: widget.profile)
+      child: GeneralProfileWidget(user: widget.profile, isFromGroupPage: widget.isFromGroupPage,)
     );
   }
 }

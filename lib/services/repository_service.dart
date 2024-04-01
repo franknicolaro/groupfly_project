@@ -18,7 +18,7 @@ abstract class RepositoryService{
   Future<void> insertGroupFlyUser(String email, String password, DateTime? dateOfBirth, String username);
   Future<void> insertHobbies(List<Hobby> selectedHobbies);
   List<Hobby> getAllHobbies();
-  Future<List<Friend>>getFriendsByUID(String uid);
+  Future<Friend>getFriendsByUID(String uid);
   Future<List<Group>>getGroupsByMemberUID(String memberUID);
   Future<List<Post>>getPostsByUID(String uid);
   Future<Group>getGroupByPostReference(DocumentReference ref);
@@ -28,6 +28,9 @@ abstract class RepositoryService{
   Future<void> insertPost(Post post);
   Future<List<GroupFlyUser>> searchProfileByName(String name);
   Future<List<Group>> searchGroupsByName(String title);
+  Future<void> removeMember(String memberUID, String groupId);
+  Future<void> disbandGroup(String groupId);
+  Future<void> createGroup(Group group);
 }
 
 class RepositoryServiceImpl implements RepositoryService{
@@ -47,7 +50,7 @@ class RepositoryServiceImpl implements RepositoryService{
   }
 
   @override
-  Future<List<Friend>>getFriendsByUID(String uid){
+  Future<Friend>getFriendsByUID(String uid){
     return GetIt.instance<FriendDao>().getFriendsByUID(uid);
   }
 
@@ -98,5 +101,20 @@ class RepositoryServiceImpl implements RepositoryService{
   @override
   List<Hobby> getAllHobbies() {
     return GetIt.instance<HobbyDao>().getAllHobbies();
+  }
+  
+  @override
+  Future<void> removeMember(String memberUID, String groupId) {
+    return GetIt.instance<GroupDao>().removeMember(memberUID, groupId);
+  }
+
+  @override
+  Future<void> disbandGroup(String groupId){
+    return GetIt.instance<GroupDao>().disbandGroup(groupId);
+  }
+  
+  @override
+  Future<void> createGroup(Group group) {
+    return GetIt.instance<GroupDao>().createGroup(group);
   }
 }

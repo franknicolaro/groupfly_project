@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:groupfly_project/widgets/ExplorerWidgets/group_explorer_widget.dart';
+import 'package:groupfly_project/widgets/GroupWidgets/my_groups_widget.dart';
 
 class GroupNavigationWidget extends StatefulWidget{
 
@@ -9,7 +10,7 @@ class GroupNavigationWidget extends StatefulWidget{
 
 class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
   Widget groupExplorer = GroupExplorerWidget();
-  Widget myGroups = Text("TODO: Implement My Groups");
+  Widget myGroups = MyGroupsWidget();
   int? _currentGroupWidgetIndex;
   final int DEFAULT_WIDGET = 0;
 
