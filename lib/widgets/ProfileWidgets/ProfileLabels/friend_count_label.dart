@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/services/repository_service.dart';
 
-import '../../../models/Friend.dart';
+import '../../../models/FriendList.dart';
 import '../../../models/group_fly_user.dart';
 import '../../../services/authorization_service.dart';
 
@@ -41,7 +41,7 @@ class _FriendCountLabelState extends State<FriendCountLabel>{
             );
           }
           else if(snapshot.hasData){
-            Friend friendList = snapshot.data as Friend;
+            FriendList friendList = snapshot.data as FriendList;
             return Text(
               'Number of Friends: ${friendList.friend_uids.length}',
               style: TextStyle(

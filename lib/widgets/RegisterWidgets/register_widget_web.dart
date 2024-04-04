@@ -57,154 +57,156 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
       ),
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 35.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 20.0),
-              const Text('Email', style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Mulish',
-                          )),
-              const SizedBox(height: 10.0),
-              TextFormField(
-                validator: (value) => value!.isEmpty ? 'Enter an email' : null,
-                onChanged: (value){
-                  setState(() => email = value);
-                },
-              ),
-              SizedBox(height: 20.0),
-              const Text('Password', style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Mulish',
-                          )),
-              SizedBox(height: 10.0),
-              TextFormField(
-                obscureText: true,
-                validator: (value) => value!.length < 6 ? 'Enter a password with 6+ characters' : null,
-                onChanged: (value){
-                  setState(() => password = value);
-                }
-              ),
-              const Text('Username', style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Mulish',
-                          )),
-              SizedBox(height: 10.0),
-              TextFormField(
-                obscureText: true,
-                validator: (value) => value!.isEmpty ? 'Enter a username' : null,
-                onChanged: (value){
-                  setState(() => username = value);
-                }
-              ),
-              SizedBox(height: 20.0),
-              const Text('Address', style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Mulish',
-                )
-              ),
-              SizedBox(height: 10.0),
-              TextFormField(
-                obscureText: false,
-                validator: (value) => value!.length < 10 ? 'Enter an address of 10+ characters' : null,
-                onChanged: (value){
-                  setState(() => address = value);
-                }
-              ),
-              SizedBox(height: 20.0),
-              const Text('Date of Birth', style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Mulish',
-                )
-              ),
-              SizedBox(height: 10.0),
-              InputDatePickerFormField(
-                initialDate: DateTime.fromMillisecondsSinceEpoch(100),
-                firstDate: DateTime(1940),
-                lastDate: DateTime(DateTime.now().year),
-                errorFormatText: "Invalid Format",
-                errorInvalidText: "Invalid Date",
-                onDateSubmitted: (date) {
-                  setState(() {
-                    dateOfBirth = date;
-                  });
-                },
-                onDateSaved: (date){
-                  setState(() {
-                    dateOfBirth = date;
-                  });
-                },
-              ),
-              SizedBox(height: 20.0),
-              const Text('Select Hobbies', style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Mulish',
-                )
-              ),
-              SizedBox(height: 10.0),
-              MultiSelectDialogField(
-                items: _items, 
-                selectedColor: Colors.green,
-                validator: (results){
-                  if (results == null || results.isEmpty) {
-                    return "Required";
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 20.0),
+                const Text('Email', style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Mulish',
+                            )),
+                const SizedBox(height: 10.0),
+                TextFormField(
+                  validator: (value) => value!.isEmpty ? 'Enter an email' : null,
+                  onChanged: (value){
+                    setState(() => email = value);
+                  },
+                ),
+                SizedBox(height: 20.0),
+                const Text('Password', style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Mulish',
+                            )),
+                SizedBox(height: 10.0),
+                TextFormField(
+                  obscureText: true,
+                  validator: (value) => value!.length < 6 ? 'Enter a password with 6+ characters' : null,
+                  onChanged: (value){
+                    setState(() => password = value);
                   }
-                  return null;
-                },
-                onConfirm: (results)  {
-                  _selectedHobbies = results;
-                }
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  _formKey.currentState!.save();
-                  if(_formKey.currentState!.validate()){
-                     dynamic result = await _auth.registerAccountAndVerify(email, password);
-                    if(result == null){
-                      setState(() {
-                        error = 'Supply valid credentials';
-                      });
-                    }
-                    else{
-                      setState(() {
-                        error = '';
-                      });
-                    }
-                    _selectableHobbies.forEach((hobby) {
-                      setState(() {
-                        hobby.setUid(_auth.currentUser!.uid);
-                      });
-                    },);
-                    widget.setHobbies(_selectedHobbies);
-                    await GetIt.instance<RepositoryService>().insertGroupFlyUser(email, address, dateOfBirth, username);
-                    widget.switchView("verify");
+                ),
+                const Text('Username', style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Mulish',
+                            )),
+                SizedBox(height: 10.0),
+                TextFormField(
+                  obscureText: true,
+                  validator: (value) => value!.isEmpty ? 'Enter a username' : null,
+                  onChanged: (value){
+                    setState(() => username = value);
                   }
-                }, 
-                child: const Text('Complete Registration',
-                  style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Mulish',
-                          )
-                )
-              ),
-              SizedBox(height: 12.0),
-              Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0))
-            ],
+                ),
+                SizedBox(height: 20.0),
+                const Text('Address', style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Mulish',
+                  )
+                ),
+                SizedBox(height: 10.0),
+                TextFormField(
+                  obscureText: false,
+                  validator: (value) => value!.length < 10 ? 'Enter an address of 10+ characters' : null,
+                  onChanged: (value){
+                    setState(() => address = value);
+                  }
+                ),
+                SizedBox(height: 20.0),
+                const Text('Date of Birth', style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Mulish',
+                  )
+                ),
+                SizedBox(height: 10.0),
+                InputDatePickerFormField(
+                  initialDate: DateTime.fromMillisecondsSinceEpoch(100),
+                  firstDate: DateTime(1940),
+                  lastDate: DateTime(DateTime.now().year),
+                  errorFormatText: "Invalid Format",
+                  errorInvalidText: "Invalid Date",
+                  onDateSubmitted: (date) {
+                    setState(() {
+                      dateOfBirth = date;
+                    });
+                  },
+                  onDateSaved: (date){
+                    setState(() {
+                      dateOfBirth = date;
+                    });
+                  },
+                ),
+                SizedBox(height: 20.0),
+                const Text('Select Hobbies', style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Mulish',
+                  )
+                ),
+                SizedBox(height: 10.0),
+                MultiSelectDialogField(
+                  items: _items, 
+                  selectedColor: Colors.green,
+                  validator: (results){
+                    if (results == null || results.isEmpty) {
+                      return "Required";
+                    }
+                    return null;
+                  },
+                  onConfirm: (results)  {
+                    _selectedHobbies = results;
+                  }
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    _formKey.currentState!.save();
+                    if(_formKey.currentState!.validate()){
+                       dynamic result = await _auth.registerAccountAndVerify(email, password);
+                      if(result == null){
+                        setState(() {
+                          error = 'Supply valid credentials';
+                        });
+                      }
+                      else{
+                        setState(() {
+                          error = '';
+                        });
+                      }
+                      _selectableHobbies.forEach((hobby) {
+                        setState(() {
+                          hobby.setUid(_auth.currentUser!.uid);
+                        });
+                      },);
+                      widget.setHobbies(_selectedHobbies);
+                      await GetIt.instance<RepositoryService>().insertGroupFlyUser(email, address, dateOfBirth, username);
+                      widget.switchView("verify");
+                    }
+                  }, 
+                  child: const Text('Complete Registration',
+                    style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Mulish',
+                            )
+                  )
+                ),
+                SizedBox(height: 12.0),
+                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0))
+              ],
+            ),
           ),
         )
       ),

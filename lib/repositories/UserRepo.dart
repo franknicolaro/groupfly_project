@@ -32,7 +32,9 @@ class UserRepo implements UserDao{
             address: result.docs[i]['address'],
             dateOfBirth: (result.docs[i]['date_of_birth'] as Timestamp).toDate(),
             photoURL: result.docs[i]['photo_url'],
-            username: result.docs[i]['username']
+            username: result.docs[i]['username'],
+            homeFeedRecency: result.docs[i]['home_feed_recency_in_days'],
+            active: result.docs[i]['active']
           );
         });
       }
@@ -49,11 +51,24 @@ class UserRepo implements UserDao{
       'date_of_birth': dateOfBirth,
       'username': username,
       'photo_url': null,
+      'home_feed_recency_in_days': 2,
+      'active': true
     })
     .then((value) => print("User added at id ${_auth.currentUser!.uid}."))
     .catchError((error) => print("Error occurred while adding user: $error"));
   }
   
+  @override
+  Future<void> deactivateUser(String uid) async{
+    firebaseDB.collection('user').doc(uid).update({
+      'active': false
+    });
+  }
   
-  
+  @override
+  Future<void> reactivateUser(String uid) async {
+    firebaseDB.collection('user').doc(uid).update({
+      'active': true
+    });
+  }
 }

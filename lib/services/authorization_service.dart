@@ -39,7 +39,29 @@ class Authorization{
     }
     return _userFromFirebaseUser(result.user);
   }
+  Future changePassword(String currentPassword, String newPassword) async{
+    User user = currentUser!;
+    final credential = EmailAuthProvider.credential(email: user.email!, password: currentPassword);
+    user.reauthenticateWithCredential(credential).then((value) {
+      user.updatePassword(newPassword).then((_){
+        return;
+      }).catchError((onError) => print("ERROR TRYING TO CHANGE PASSWORD, PASSWORD COULD NOT UPDATE: $onError"));
+    }).catchError((error) => print("ERROR TRYING TO CHANGE PASSWORD, COULD NOT REAUTHENTICATE: $error"));
+  }
+  Future deleteUser() async{
+    try{
+      await _auth.currentUser!.delete();
+    }
+    catch(e){
+      print("Error orccured while trying to delete account");
+    }
+  }
   Future signOut() async{
-    await _auth.signOut();
+    try{
+      await _auth.signOut();
+    }
+    catch(e){
+      print("Error orccured while trying to delete account");
+    }
   }
 }

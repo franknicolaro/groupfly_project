@@ -20,7 +20,12 @@ class _UserPostListState extends State<UserPostList>{
       child: SingleChildScrollView(
         child: Column(
           children: widget.posts.map((post) => 
-            PostContainer(post: post, user: widget.user)
+            Column(
+              children: [
+                SizedBox(height: 15,),
+                PostContainer(post: post, user: widget.user)
+              ],
+            ),
           ).toList(),
         ),
       )

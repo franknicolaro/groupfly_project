@@ -30,7 +30,7 @@ class _PostContainerState extends State<PostContainer>{
     initGroup();
   }
   void initImageUrl() {
-      imageUrl = _storage.getImageUrlFromStorage(fbStorage.ref().child(widget.post.imageUrl));
+    imageUrl = _storage.getImageUrlFromStorage(fbStorage.ref().child(widget.post.imageUrl));
   }
   void initGroup(){
     groupAsFuture = GetIt.instance<RepositoryService>().getGroupByPostReference(widget.post.groupRef);
@@ -41,10 +41,10 @@ class _PostContainerState extends State<PostContainer>{
       children: [
         Center(
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.40,
-            width: MediaQuery.of(context).size.width * 0.58,
+            height: MediaQuery.of(context).size.height * 0.34, //0.4
+            width: MediaQuery.of(context).size.width * 0.55, //0.58
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 17, 127, 171),
+              color: Color.fromARGB(255, 21, 153, 206),
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Column(
@@ -92,29 +92,31 @@ class _PostContainerState extends State<PostContainer>{
                           }
                           else if(snapshot.hasData){
                             Group group = snapshot.data as Group;
-                            return Column(
-                              children: [
-                                Container(
-                                  child: Text(
-                                    'From: ${group.title}',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'Mulish',
+                            return Expanded(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    child: Text(
+                                      'From: ${group.title}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Mulish',
+                                      )
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Text(
+                                      'On ${group.meeting_time.month}/${group.meeting_time.day}/${group.meeting_time.year}'
                                     )
                                   ),
-                                ),
-                                Container(
-                                  child: Text(
-                                    'On ${group.meeting_time.month}/${group.meeting_time.day}/${group.meeting_time.year}'
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    widget.post.description
                                   )
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  widget.post.description
-                                )
-                              ],
+                                ],
+                              )
                             );
                           }
                         }

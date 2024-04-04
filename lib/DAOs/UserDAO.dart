@@ -4,4 +4,6 @@ abstract class UserDao{
   Future<void> insertGroupFlyUser(String email, String address, DateTime? dateOfBirth, String username);
   Future<GroupFlyUser> getGroupFlyUserByUID(String uid);
   Future<List<GroupFlyUser>> searchProfileByName(String name);
+  Future<void> deactivateUser(String uid);
+  Future<void> reactivateUser(String uid);
 }

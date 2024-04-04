@@ -12,7 +12,6 @@ class _NumberOfGroupsLabelState extends State<NumberOfGroupsLabel>{
   @override
   void initState(){
     super.initState();
-    //initGroups();
   }
 
   @override

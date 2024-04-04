@@ -1,5 +1,5 @@
-import '../models/Friend.dart';
+import '../models/FriendList.dart';
 
 abstract class FriendDao{
-  Future<Friend> getFriendsByUID(String uid);
+  Future<FriendList> getFriendsByUID(String uid);
 }

@@ -39,7 +39,6 @@ class _UsernameLabelState extends State<UsernameLabel>{
           }
           else if(snapshot.hasData){
             GroupFlyUser tmp = snapshot.data as GroupFlyUser;
-            print(tmp.username);
             return Text(
               tmp.username,
               style: TextStyle(

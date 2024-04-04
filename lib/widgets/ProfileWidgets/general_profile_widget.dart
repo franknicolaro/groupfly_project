@@ -176,7 +176,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
     taskSnapshot.ref.getDownloadURL().then((value) {
       setState((){
         tempUrl = value;
-        Post postToAdd = Post(comments: [], description: _newPostController.text, groupRef: groupRef, imageUrl: tempUrl!, likesByUid: [], postId: '', posterId: widget.user.uid!);
+        Post postToAdd = Post(comments: [], description: _newPostController.text, groupRef: groupRef, imageUrl: tempUrl!, likesByUid: [], postId: '', posterId: widget.user.uid!, datePosted: DateTime.now());
         GetIt.instance<RepositoryService>().insertPost(postToAdd);
         posts.insert(0, postToAdd);
       });
@@ -232,6 +232,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
             )
           ),
           SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Row(
               children: groups.map((group) =>
                 OutlinedButton(

@@ -7,7 +7,7 @@ import '../DAOs/FriendDAO.dart';
 import '../DAOs/GroupDAO.dart';
 import '../DAOs/HobbyDAO.dart';
 import '../DAOs/PostDAO.dart';
-import '../models/Friend.dart';
+import '../models/FriendList.dart';
 import '../models/Group.dart';
 import '../models/Hobby.dart';
 import '../models/Post.dart';
@@ -18,9 +18,10 @@ abstract class RepositoryService{
   Future<void> insertGroupFlyUser(String email, String password, DateTime? dateOfBirth, String username);
   Future<void> insertHobbies(List<Hobby> selectedHobbies);
   List<Hobby> getAllHobbies();
-  Future<Friend>getFriendsByUID(String uid);
+  Future<FriendList>getFriendsByUID(String uid);
   Future<List<Group>>getGroupsByMemberUID(String memberUID);
   Future<List<Post>>getPostsByUID(String uid);
+  Future<List<Post>>getRecentPostsByFriendUIDs(GroupFlyUser user, FriendList friends);
   Future<Group>getGroupByPostReference(DocumentReference ref);
   Future<void> removeLike(String uid, String postId);
   Future<void> addLike(String uid, String postId);
@@ -31,6 +32,8 @@ abstract class RepositoryService{
   Future<void> removeMember(String memberUID, String groupId);
   Future<void> disbandGroup(String groupId);
   Future<void> createGroup(Group group);
+  Future<void> deactivateUser(String uid);
+  Future<void> reactivateUser(String uid);
 }
 
 class RepositoryServiceImpl implements RepositoryService{
@@ -50,7 +53,7 @@ class RepositoryServiceImpl implements RepositoryService{
   }
 
   @override
-  Future<Friend>getFriendsByUID(String uid){
+  Future<FriendList>getFriendsByUID(String uid){
     return GetIt.instance<FriendDao>().getFriendsByUID(uid);
   }
 
@@ -67,6 +70,11 @@ class RepositoryServiceImpl implements RepositoryService{
   @override
   Future<List<Post>> getPostsByUID(String uid) {
     return GetIt.instance<PostDao>().getPostsByUID(uid);
+  }
+
+  @override
+  Future<List<Post>>getRecentPostsByFriendUIDs(GroupFlyUser user, FriendList friends){
+    return GetIt.instance<PostDao>().getRecentPostsByFriendUIDs(user, friends);
   }
 
   @override
@@ -116,5 +124,14 @@ class RepositoryServiceImpl implements RepositoryService{
   @override
   Future<void> createGroup(Group group) {
     return GetIt.instance<GroupDao>().createGroup(group);
+  }
+  
+  @override
+  Future<void> deactivateUser(String uid) {
+    return GetIt.instance<UserDao>().deactivateUser(uid);
+  }
+  @override
+  Future<void> reactivateUser(String uid) {
+    return GetIt.instance<UserDao>().reactivateUser(uid);
   }
 }

@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../DAOs/PostDAO.dart';
+import '../models/FriendList.dart';
 import '../models/Post.dart';
 import '../models/PostComment.dart';
 import '../models/group_fly_user.dart';
@@ -30,11 +31,50 @@ class PostRepo implements PostDao{
               );
             }),
             likesByUid: List.from(result.docs[i]['likes_by_uid']),
+            datePosted: result.docs[i]['date_posted'].toDate()
           );
         });
       }
     },);
     return posts;
+  }
+
+  @override
+  Future<List<Post>>getRecentPostsByFriendUIDs(GroupFlyUser user, FriendList friends) async{
+    List<Post> allRecentPosts = [];
+    List<Post> friendPosts = [];
+    DateTime now = DateTime.now();
+    CollectionReference postCollection = firebaseDB.collection('post');
+    for (var friendUid in friends.friend_uids) {
+        await postCollection.where('poster_uid', isEqualTo: friendUid)
+                          .where('date_posted', isGreaterThanOrEqualTo: now.subtract(Duration(days: user.homeFeedRecency!)))
+                          .get().then((result) {
+        print("result length: ${result.docs.length}");
+        if(result.docs.isNotEmpty){
+          friendPosts = List.generate(result.docs.length, (i){
+            return Post(
+              postId: result.docs[i].id,
+              posterId: result.docs[i]['poster_uid'],
+              groupRef: result.docs[i]['group_ref'],
+              description: result.docs[i]['caption'],
+              imageUrl: result.docs[i]['image_name'],
+              comments: List.generate(result.docs[i]['comments'].length, (j){
+                return PostComment(
+                  text: result.docs[i]['comments'][j]['text'], 
+                  user_uid: result.docs[i]['comments'][j]['user_uid'],
+                  username: result.docs[i]['comments'][j]['username']
+                );
+              }),
+              likesByUid: List.from(result.docs[i]['likes_by_uid']),
+              datePosted: result.docs[i]['date_posted'].toDate()
+            );
+          });
+          allRecentPosts.addAll(friendPosts);
+          allRecentPosts.sort((postOne, postTwo) => postOne.datePosted.compareTo(postTwo.datePosted));
+        }
+      },).catchError((error) => print("Error while trying to get friend posts: ${error}"));
+    }
+    return allRecentPosts;
   }
   
   @override
@@ -71,7 +111,8 @@ class PostRepo implements PostDao{
         'group_ref': post.groupRef,
         'image_name': post.imageUrl,
         'likes_by_uid': post.likesByUid,
-        'poster_uid': post.posterId
+        'poster_uid': post.posterId,
+        'date_posted': post.datePosted
       }
     ).onError((error, stackTrace) => "Error adding post to Firestore: $error");
   }

@@ -7,8 +7,10 @@ class GroupFlyUser{
   late DateTime? dateOfBirth;
   late String username;
   late String? photoURL;
+  late int? homeFeedRecency;
+  late bool? active;
 
-  GroupFlyUser({required this.uid, this.email = '', this.address = '', this.dateOfBirth, this.username = '', this.photoURL});
+  GroupFlyUser({required this.uid, this.email = '', this.address = '', this.dateOfBirth, this.username = '', this.photoURL, this.homeFeedRecency, this.active});
 
   factory GroupFlyUser.fromDB(DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,){
@@ -19,7 +21,9 @@ class GroupFlyUser{
         address: map?['address'], 
         dateOfBirth: (map?['date_of_birth'] as Timestamp).toDate(),
         username: map?['username'],
-        photoURL: map?['photo_url']
+        photoURL: map?['photo_url'],
+        homeFeedRecency: map?['home_feed_recency_in_days'],
+        active: map?['active']
     );
   }
 

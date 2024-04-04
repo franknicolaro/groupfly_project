@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Friend{
+class FriendList{
 
   final String user_uid;
   late List<String> friend_uids;
 
-  Friend({required this.user_uid, required this.friend_uids});
+  FriendList({required this.user_uid, required this.friend_uids});
 
-  factory Friend.fromDB(DocumentSnapshot<Map<String,dynamic>> snapshot,
+  factory FriendList.fromDB(DocumentSnapshot<Map<String,dynamic>> snapshot,
     SnapshotOptions? options,){
       final map = snapshot.data();
-      return Friend(
+      return FriendList(
         user_uid: map?['uid'],
         friend_uids: map?['frienduid'],
     );
