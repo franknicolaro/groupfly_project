@@ -35,4 +35,8 @@ class GroupFlyUser{
       'username': username
     };
   }
+
+  void reactivate(){
+    active = true;
+  }
 }

@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/DAOs/UserDAO.dart';
+import 'package:groupfly_project/models/GroupFlyNotification.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
 
 import '../DAOs/FriendDAO.dart';
 import '../DAOs/GroupDAO.dart';
 import '../DAOs/HobbyDAO.dart';
+import '../DAOs/NotificationDAO.dart';
 import '../DAOs/PostDAO.dart';
 import '../models/FriendList.dart';
 import '../models/Group.dart';
@@ -30,10 +32,19 @@ abstract class RepositoryService{
   Future<List<GroupFlyUser>> searchProfileByName(String name);
   Future<List<Group>> searchGroupsByName(String title);
   Future<void> removeMember(String memberUID, String groupId);
+  Future<void> addMember(String memberUID, String groupId);
   Future<void> disbandGroup(String groupId);
   Future<void> createGroup(Group group);
   Future<void> deactivateUser(String uid);
-  Future<void> reactivateUser(String uid);
+  Future<void> activateUser(String uid);
+  Future<void> initFriendDocument(String uid);
+  Future<void> removeFriend(String uid, String frienduid);
+  Future<void> addFriend(String uid, String frienduid);
+  Future<List<GroupFlyNotification>> getAllNotificationsByRequesteeUid(String requesteeUid);
+  Future<void> removeNotification(GroupFlyNotification notification);
+  Future<void> sendFriendRequestNotification(String requesterUid, String requesteeUid);
+  Future<void> sendGroupRequestNotification(GroupFlyNotification notification);
+  Future<void> sendGroupInviteNotification(GroupFlyNotification notification);
 }
 
 class RepositoryServiceImpl implements RepositoryService{
@@ -115,6 +126,10 @@ class RepositoryServiceImpl implements RepositoryService{
   Future<void> removeMember(String memberUID, String groupId) {
     return GetIt.instance<GroupDao>().removeMember(memberUID, groupId);
   }
+  @override
+  Future<void> addMember(String memberUID, String groupId) {
+    return GetIt.instance<GroupDao>().addMember(memberUID, groupId);
+  }
 
   @override
   Future<void> disbandGroup(String groupId){
@@ -131,7 +146,45 @@ class RepositoryServiceImpl implements RepositoryService{
     return GetIt.instance<UserDao>().deactivateUser(uid);
   }
   @override
-  Future<void> reactivateUser(String uid) {
-    return GetIt.instance<UserDao>().reactivateUser(uid);
+  Future<void> activateUser(String uid) {
+    return GetIt.instance<UserDao>().activateUser(uid);
+  }
+  
+  @override
+  Future<void> initFriendDocument(String uid){
+    return GetIt.instance<FriendDao>().initFriendDocument(uid);
+  }
+  @override
+  Future<void> addFriend(String uid, String frienduid) {
+    return GetIt.instance<FriendDao>().addFriend(uid, frienduid);
+  }
+  
+  @override
+  Future<void> removeFriend(String uid, String frienduid) {
+    return GetIt.instance<FriendDao>().removeFriend(uid, frienduid);
+  }
+  
+  @override
+  Future<List<GroupFlyNotification>> getAllNotificationsByRequesteeUid(String requesteeUid) {
+    return GetIt.instance<NotificationDao>().getAllNotificationsByRequesteeUid(requesteeUid);
+  }
+  
+  @override
+  Future<void> removeNotification(GroupFlyNotification notification) {
+    return GetIt.instance<NotificationDao>().removeNotification(notification);
+  }
+  
+  @override
+  Future<void> sendFriendRequestNotification(String requesterUid, String requesteeUid) {
+    return GetIt.instance<NotificationDao>().sendFriendRequestNotification(requesterUid, requesteeUid);
+  }
+  
+  @override
+  Future<void> sendGroupRequestNotification(GroupFlyNotification notification) {
+    return GetIt.instance<NotificationDao>().sendGroupRequestNotification(notification);
+  }
+  @override
+  Future<void> sendGroupInviteNotification(GroupFlyNotification notification) {
+    return GetIt.instance<NotificationDao>().sendGroupInviteNotification(notification);
   }
 }

@@ -2,11 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:groupfly_project/DAOs/FriendDAO.dart';
 import 'package:groupfly_project/DAOs/HobbyDAO.dart';
+import 'package:groupfly_project/DAOs/NotificationDAO.dart';
 import 'package:groupfly_project/DAOs/UserDAO.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
 import 'package:groupfly_project/repositories/FriendRepo.dart';
 import 'package:groupfly_project/repositories/GroupRepo.dart';
 import 'package:groupfly_project/repositories/HobbyRepo.dart';
+import 'package:groupfly_project/repositories/NotificationRepo.dart';
 import 'package:groupfly_project/repositories/PostRepo.dart';
 import 'package:groupfly_project/repositories/UserRepo.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
@@ -28,6 +30,7 @@ Future<void> main() async {
   GetIt.instance.registerLazySingleton<FriendDao>(() => FriendRepo());
   GetIt.instance.registerLazySingleton<GroupDao>(() => GroupRepo());
   GetIt.instance.registerLazySingleton<PostDao>(() => PostRepo());
+  GetIt.instance.registerLazySingleton<NotificationDao>(() => NotificationRepo());
   runApp(const MyApp());
 }
 

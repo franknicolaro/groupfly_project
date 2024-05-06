@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/models/FriendList.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/listed_profile_container.dart';
 
+import '../../models/GroupFlyNotification.dart';
 import '../../services/repository_service.dart';
 
 class ProfileExplorerWidget extends StatefulWidget{
-  ProfileExplorerWidget({super.key});
+  FriendList friendList;
+  List<GroupFlyNotification> notifications;
+  Function removeFriend;
+  ProfileExplorerWidget({super.key, required this.friendList, required this.notifications, required this.removeFriend});
   @override
   State<ProfileExplorerWidget> createState() => _ProfileExplorerWidgetState();
 }
@@ -14,6 +19,12 @@ class ProfileExplorerWidget extends StatefulWidget{
 class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
   List<GroupFlyUser> profiles = [];
   var _profileExplorerController = TextEditingController();
+
+  void refresh(){
+    setState(() {
+      
+    });
+  }
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -21,15 +32,6 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 61, 111, 67),
         title: Text('Profile Explorer'),
-        actions:[
-          TextButton.icon(
-            onPressed:(){
-              //Display notifications widget
-            },
-            icon: const Icon(Icons.add_alert_sharp),
-            label: const Text("Notifications")
-          )
-        ]
       ),
       body: Center(
         child: Column(
@@ -59,7 +61,7 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
                 child: Column(
                   children:
                     profiles.map((profile) =>
-                      ListedProfileContainer(profile: profile, isFromGroupPage: false,)
+                      ListedProfileContainer(profile: profile, isFromOtherPage: false, removeFriend: widget.removeFriend,)
                     ).toList(),
                 )
               ),

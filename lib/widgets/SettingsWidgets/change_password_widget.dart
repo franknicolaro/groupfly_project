@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
+import 'package:groupfly_project/services/validation_service.dart';
 
 class ChangePasswordWidget extends StatefulWidget{
   ChangePasswordWidget({super.key});
@@ -10,6 +11,7 @@ class ChangePasswordWidget extends StatefulWidget{
 
 class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
   final Authorization _auth = Authorization();
+  final ValidationService _validation = ValidationService();
   final _formKey = GlobalKey<FormState>();
 
   String oldPassword = '';
@@ -44,6 +46,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
+                  obscureText: true,
                   validator: (value) => value!.isEmpty ? 'Enter your old password' : null,
                   onChanged:(value) {
                     setState(() => oldPassword = value);
@@ -60,7 +63,8 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
-                  validator: (value) => value!.isEmpty ? 'Enter a new password' : null,
+                  obscureText: true,
+                  validator: (value) => _validation.validPassword(value!) ? 'Enter a new password that is 8+ characters, with uppercase, lowercase, and special characters' : null,
                   onChanged:(value) {
                     setState(() => newPassword = value);
                   },

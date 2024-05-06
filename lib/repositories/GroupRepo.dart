@@ -87,6 +87,12 @@ class GroupRepo implements GroupDao{
       'members': FieldValue.arrayRemove([memberUID])
     });
   }
+  @override
+  Future<void> addMember(String memberUID, String groupId)async {
+    firebaseDB.collection('group').doc(groupId).update({
+      'members': FieldValue.arrayUnion([memberUID])
+    });
+  }
 
   @override
   Future<void> disbandGroup(String groupId)async {

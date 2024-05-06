@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:groupfly_project/models/group_fly_user.dart';
 
+import '../../models/FriendList.dart';
 import '../../models/Group.dart';
 import 'group_widget.dart';
 
 class ListedGroupContainer extends StatefulWidget{
   Group group;
-  ListedGroupContainer({required this.group});
+  List<GroupFlyUser> friends;
+  Function removeFriend;
+  ListedGroupContainer({required this.group, required this.friends, required this.removeFriend});
   @override
   State<ListedGroupContainer> createState() => _ListedGroupContainerState();
 }
@@ -13,6 +17,9 @@ class ListedGroupContainer extends StatefulWidget{
 class _ListedGroupContainerState extends State<ListedGroupContainer>{
   void refresh(){
     setState(() {});
+  }
+  void removeFriend(){
+    widget.removeFriend();
   }
   @override
   Widget build(BuildContext context){
@@ -93,7 +100,7 @@ class _ListedGroupContainerState extends State<ListedGroupContainer>{
   Widget displayGroupPage(){
     return Container(
       color: Color.fromARGB(255, 17, 127, 171),
-      child: GroupWidget(group: widget.group, notifyWidget: refresh,)
+      child: GroupWidget(group: widget.group, notifyWidget: refresh, friends: widget.friends, removeFriend: removeFriend,)
     );
   }
 }

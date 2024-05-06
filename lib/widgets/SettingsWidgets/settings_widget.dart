@@ -19,6 +19,7 @@ class _SettingsWidgetState extends State<SettingsWidget>{
   //Change Password Button
   //Logout Button
   //Deactivate Account Button. 
+  //Set HomeFeed time
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -88,6 +89,24 @@ class _SettingsWidgetState extends State<SettingsWidget>{
               )
             )
           ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: (){
+              //TODO: Setting Home Feed
+              /*showModalBottomSheet(
+                context: context,
+                builder: ((builder) => setHomeFeedPopup()),
+              );*/
+            }, 
+            child: const Text("Set Home Feed",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                fontFamily: 'Mulish'
+              )
+            )
+          ),
         ],
       ),
     );
@@ -110,13 +129,20 @@ class _SettingsWidgetState extends State<SettingsWidget>{
           ),
           actions: [
             ElevatedButton(
-              onPressed: () async{
-                await GetIt.instance<RepositoryService>().deactivateUser(_auth.currentUser!.uid).then((value) {
+              onPressed: () {
+                GetIt.instance<RepositoryService>().deactivateUser(_auth.currentUser!.uid).then((value) {
                   _auth.signOut();
+                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 });
               },
               child: const Text("Yes"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("No"),
             )
           ],
         );

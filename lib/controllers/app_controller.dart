@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/models/Group.dart';
+import 'package:groupfly_project/models/GroupFlyNotification.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 import 'package:groupfly_project/widgets/ExplorerWidgets/profile_explorer_widget.dart';
 import 'package:groupfly_project/widgets/GroupWidgets/group_navigation_widget.dart';
@@ -20,16 +22,18 @@ class AppController extends StatefulWidget {
 
 class _AppControllerState extends State<AppController>{
   Authorization _auth = Authorization();
-  Widget profileExplorer = ProfileExplorerWidget();
-  Widget groupNavigation = GroupNavigationWidget();
+  Widget? profileExplorer;
+  Widget? groupNavigation;
   Widget? homeFeed;
   Widget? currentProfilePage;
   GroupFlyUser? currentUser;
   int? _currentPageIndex;
   FriendList? friends;
   List<Post> mostRecentPosts = [];
-  final int DEFAULT_PAGE = 1;
-  //TODO: get groups of user here.
+  List<GroupFlyUser> friendList = [];
+  List<GroupFlyNotification> userNotifications = [];
+  final int DEFAULT_PAGE = 2;
+  //TODO: get groups & posts of user here.
 
   @override
   void initState(){
@@ -52,45 +56,55 @@ class _AppControllerState extends State<AppController>{
     await GetIt.instance<RepositoryService>().getFriendsByUID(_auth.currentUser!.uid).then((list) {
       setState(() {
         friends = list;
+        for(String uid in friends!.friend_uids){
+          GetIt.instance<RepositoryService>().getGroupFlyUserByUID(uid).then((friend){
+            friendList.add(friend);
+          });
+        }
         GetIt.instance<RepositoryService>().getRecentPostsByFriendUIDs(currentUser!, friends!).then(
           (posts) {
-            setState(() {
-              mostRecentPosts = posts;
-              currentProfilePage = ProfileScreen(user: currentUser!);
-              homeFeed = HomeFeedWidget(user: currentUser!, mostRecentPosts: mostRecentPosts);
-            });
+            GetIt.instance<RepositoryService>().getAllNotificationsByRequesteeUid(_auth.currentUser!.uid).then((notifications){
+              setState(() {
+                userNotifications = notifications;
+                mostRecentPosts = posts;
+                currentProfilePage = ProfileScreen(user: currentUser!, friends: friends!, removeFriend: removeFriend, notifications: userNotifications,);
+                homeFeed = HomeFeedWidget(user: currentUser!, mostRecentPosts: mostRecentPosts, notifications: userNotifications, removeNotification: removeNotification,);
+                groupNavigation = GroupNavigationWidget(friends: friendList, notifications: userNotifications, removeFriend: removeFriend,);
+                profileExplorer = ProfileExplorerWidget(friendList: friends!, notifications: userNotifications, removeFriend: removeFriend,);
+              });
+            }); 
           }
         );
       });
     },);
   }
+
+  void removeFriend(String uid){
+    setState(() {
+      friends!.friend_uids.removeWhere((friendUid) => friendUid == uid);
+    });
+  }
+
+  void removeNotification(GroupFlyNotification notification){
+    setState(() {
+      userNotifications.removeWhere((userNotification) => userNotification == notification);
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     /*TODO: Cases:
-    *   2: Account/Profile Navigation 
-    *     a: Settings page within account tab
-    *   3: Notifications Widget
-    *     a: displaying all notifications
-    *     b: Accept invite/request pages(widgets?)
-    *   4: Friends
-    *     a: Invite Friends to group
-    *     b: Add/remove friends
-    *     c: friends page (via account navigation)
     *   5: Refactor
-    *     a: VALIDATION SERVICE FOR INPUT FIELDS *******
-    *     b: PUT ALL GENERAL QUERY STUF HERE (i.e. groups by current user's uid, friends of current user's uid, posts)
+    *     b: PUT ALL GENERAL QUERY STUFF HERE (i.e. groups by current user's uid, friends of current user's uid, posts)
     *     b: anything that doesn't look right on web
     *     c: improving the look a little
-    *   6: Mobile
-    *     a: Migrate files to mobile
-    *     b: Adjust UI as needed
     */
     return Scaffold(
       body: currentUser == null ? Text("Loading...") : currentUser!.active! ? IndexedStack(
         index: _currentPageIndex,
         children: [
-          profileExplorer,
-          groupNavigation,
+          profileExplorer == null ? Text("Loading...") : profileExplorer!,
+          groupNavigation == null ? Text("Loading...") : groupNavigation!,
           homeFeed == null ? Text("Loading...") : homeFeed!,
           currentProfilePage == null ? Text("not yet loaded") : currentProfilePage!
         ],
@@ -111,10 +125,12 @@ class _AppControllerState extends State<AppController>{
               children: [
                 ElevatedButton(
                   onPressed: (){
-                    setState(() {
                       initInformationRelatedToUser();
-                      GetIt.instance<RepositoryService>().reactivateUser(currentUser!.uid!);
-                    });
+                      GetIt.instance<RepositoryService>().activateUser(currentUser!.uid!).then((value) {
+                        setState(() {
+                          currentUser!.reactivate();
+                        });
+                      },);
                   }, 
                   child: const Text("Yes")
                 ),

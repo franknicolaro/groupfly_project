@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/models/group_fly_user.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
+import 'package:groupfly_project/services/validation_service.dart';
 import 'package:groupfly_project/widgets/GroupWidgets/listed_group_container.dart';
 
 import '../../models/Group.dart';
@@ -9,14 +11,17 @@ import '../../services/repository_service.dart';
 
 class MyGroupsWidget extends StatefulWidget{
   //TODO: REFACTOR: Pass groups through here
-  MyGroupsWidget({super.key});
+  List<GroupFlyUser> friends;
+  Function removeFriend;
+  MyGroupsWidget({super.key, required this.friends, required this.removeFriend});
 
   @override
   State<MyGroupsWidget> createState() => _MyGroupsWidgetState();
 }
 
 class _MyGroupsWidgetState extends State<MyGroupsWidget>{
-  Authorization _auth = Authorization();
+  final Authorization _auth = Authorization();
+  final ValidationService _validation = ValidationService();
   List<Group> groups = [];
   final _formKey = GlobalKey<FormState>();
   List<Hobby> selectableHobbies = [];
@@ -80,7 +85,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
             child: SingleChildScrollView(
               child: Column(
                 children: groups.map((group) =>
-                  group.isActive ? ListedGroupContainer(group: group) : Container()
+                  group.isActive ? ListedGroupContainer(group: group, friends: widget.friends, removeFriend: widget.removeFriend,) : Container()
                 ).toList()
               )
             )
@@ -275,7 +280,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                   )
                 ),
                 TextFormField(
-                  validator: (value) => value!.isEmpty || (int.tryParse(value) != null && !(int.parse(value) > 1)) ? 'Enter a number greater than 1' : null,
+                  validator: (value) => !_validation.validMaxCapacity(value!) ? 'Enter a number greater than 1' : null,
                   onChanged: (value){
                     setState(() {
                       maxCapacity = int.parse(value);

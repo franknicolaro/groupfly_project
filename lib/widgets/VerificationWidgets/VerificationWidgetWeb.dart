@@ -41,6 +41,8 @@ class _VerificationWidgetWebState extends State<VerificationWidgetWeb>{
     user = _auth.currentUser;
     await user?.reload();
     if(user != null && user!.emailVerified){
+      await GetIt.instance<RepositoryService>().activateUser(user!.uid);
+      await GetIt.instance<RepositoryService>().initFriendDocument(user!.uid);
       await GetIt.instance<RepositoryService>().insertHobbies(widget.hobbies);
       timer?.cancel();
     }

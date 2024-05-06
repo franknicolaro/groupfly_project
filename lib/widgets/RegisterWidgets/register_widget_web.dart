@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/services/repository_service.dart';
+import 'package:groupfly_project/services/validation_service.dart';
 
 import '../../models/Hobby.dart';
 import '../../services/authorization_service.dart';
@@ -14,9 +15,10 @@ class RegisterWidgetWeb extends StatefulWidget{
   @override
   _RegisterWidgetWebState createState() => _RegisterWidgetWebState();
 }
-
+//TODO: IMPLEMENT VALIDATION!!!!!!!!!!
 class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
   final Authorization _auth = Authorization();
+  final ValidationService _validation = ValidationService();
   final _formKey = GlobalKey<FormState>();
 
   String email = '';
@@ -86,7 +88,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                 SizedBox(height: 10.0),
                 TextFormField(
                   obscureText: true,
-                  validator: (value) => value!.length < 6 ? 'Enter a password with 6+ characters' : null,
+                  validator: (value) => !_validation.validPassword(value!) ? 'Enter a password that contains 8+ characters, an uppercase and lowercase letter, and a special character' : null,
                   onChanged: (value){
                     setState(() => password = value);
                   }
@@ -99,8 +101,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                             )),
                 SizedBox(height: 10.0),
                 TextFormField(
-                  obscureText: true,
-                  validator: (value) => value!.isEmpty ? 'Enter a username' : null,
+                  validator: (value) => !_validation.validUsername(value!) ? 'Enter a username with at least 2 characters but no more than 25 characters' : null,
                   onChanged: (value){
                     setState(() => username = value);
                   }
@@ -115,8 +116,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                 ),
                 SizedBox(height: 10.0),
                 TextFormField(
-                  obscureText: false,
-                  validator: (value) => value!.length < 10 ? 'Enter an address of 10+ characters' : null,
+                  validator: (value) => !_validation.validAddress(value!) ? 'Enter an address of 10+ characters' : null,
                   onChanged: (value){
                     setState(() => address = value);
                   }
@@ -133,9 +133,9 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                 InputDatePickerFormField(
                   initialDate: DateTime.fromMillisecondsSinceEpoch(100),
                   firstDate: DateTime(1940),
-                  lastDate: DateTime(DateTime.now().year),
+                  lastDate: DateTime(DateTime.now().year - 18, DateTime.now().month, DateTime.now().day),
                   errorFormatText: "Invalid Format",
-                  errorInvalidText: "Invalid Date",
+                  errorInvalidText: "Invalid Date: Must be 18+ to register.",
                   onDateSubmitted: (date) {
                     setState(() {
                       dateOfBirth = date;
@@ -159,12 +159,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                 MultiSelectDialogField(
                   items: _items, 
                   selectedColor: Colors.green,
-                  validator: (results){
-                    if (results == null || results.isEmpty) {
-                      return "Required";
-                    }
-                    return null;
-                  },
+                  validator: (results) => !_validation.validHobbiesList(results!) ? "At least one hobby must be selected" : null,
                   onConfirm: (results)  {
                     _selectedHobbies = results;
                   }
@@ -176,7 +171,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                        dynamic result = await _auth.registerAccountAndVerify(email, password);
                       if(result == null){
                         setState(() {
-                          error = 'Supply valid credentials';
+                          error = 'Supply valid credentials: Email may be in improper form.';
                         });
                       }
                       else{

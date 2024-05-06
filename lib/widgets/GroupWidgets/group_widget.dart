@@ -1,5 +1,9 @@
+import 'dart:html';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/models/GroupFlyNotification.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 import 'package:groupfly_project/services/repository_service.dart';
@@ -10,7 +14,9 @@ import '../../models/Group.dart';
 class GroupWidget extends StatefulWidget{
   Group group;
   final Function notifyWidget;
-  GroupWidget({required this.group, required this.notifyWidget});
+  List<GroupFlyUser> friends;
+  Function removeFriend;
+  GroupWidget({required this.group, required this.notifyWidget, required this.friends, required this.removeFriend});
 
   @override
   State<GroupWidget> createState() => _GroupWidgetState();
@@ -77,6 +83,11 @@ class _GroupWidgetState extends State<GroupWidget>{
     });
     return result;
   }
+  void refresh(){
+    setState(() {
+      
+    });
+  }
   @override
   Widget build(BuildContext context){
     return Container(
@@ -141,7 +152,9 @@ class _GroupWidgetState extends State<GroupWidget>{
             visible: findMemberWithUID(_auth.currentUser!.uid) == null,
             child: ElevatedButton(
               onPressed: (){
-                //Send join request notification to owner of group
+                DocumentReference refToGroup = FirebaseFirestore.instance.doc("group/${widget.group.group_id}");
+                GroupFlyNotification notificationToInsert = GroupFlyNotification(requesteeUid: owner!.uid!, requesterUid: _auth.currentUser!.uid, groupRef: refToGroup, type: 'group_request', docId: "");
+                GetIt.instance<RepositoryService>().sendGroupRequestNotification(notificationToInsert);
               }, 
               child: const Text("Request to join group",
                 style: TextStyle(
@@ -156,6 +169,11 @@ class _GroupWidgetState extends State<GroupWidget>{
           ElevatedButton(
             onPressed: (){
               //Invite friends to group
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: ((builder) => inviteFriendsPopUp())
+              ); 
             }, 
             child: const Text("Invite friends to Group",
               style: TextStyle(
@@ -218,40 +236,96 @@ class _GroupWidgetState extends State<GroupWidget>{
     );
   }
   Widget memberList(){
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Column(
-        children: members.map((profile) =>
-          Row(
-            children: [
-              ListedProfileContainer(profile: profile, isFromGroupPage: true,),
-              SizedBox(width: 5),
-              (_auth.currentUser!.uid != profile.uid && _auth.currentUser!.uid == owner!.uid) ?
-              ElevatedButton(
-                onPressed: (){
-                  //TODO: add confirmation dialog
-                  GetIt.instance<RepositoryService>().removeMember(profile.uid!, widget.group.group_id).then((_) {
-                  setState(() {
-                    members.removeWhere((member) =>
-                      member.uid == profile.uid!
-                    );
-                    widget.group.member_uids.remove(profile.uid!);
+    return Container(
+      color: Color.fromARGB(255, 10, 70, 94),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: members.map((profile) =>
+            Row(
+              children: [
+                ListedProfileContainer(profile: profile, isFromOtherPage: true, removeFriend: widget.removeFriend,),
+                SizedBox(width: 5),
+                (_auth.currentUser!.uid != profile.uid && _auth.currentUser!.uid == owner!.uid) ?
+                ElevatedButton(
+                  onPressed: (){
+                    //TODO: add confirmation dialog
+                    GetIt.instance<RepositoryService>().removeMember(profile.uid!, widget.group.group_id).then((_) {
+                    setState(() {
+                      members.removeWhere((member) =>
+                        member.uid == profile.uid!
+                      );
+                      widget.group.member_uids.remove(profile.uid!);
+                    });
+                    widget.notifyWidget();
                   });
-                  widget.notifyWidget();
-                });
-                }, 
-                child: const Text("Remove",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Mulish'
+                  }, 
+                  child: const Text("Remove",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Mulish'
+                    )
                   )
+                ) : Container()
+              ],
+            )
+          ).toList(),
+        ),
+      ),
+    );
+  }
+  Widget inviteFriendsPopUp(){
+    return Container(
+      color:Color.fromARGB(255, 10, 70, 94),
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.topLeft,
+            child: BackButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+          Text("Invite Friends",
+            style: TextStyle(
+              fontFamily: "Mulish",
+              fontSize: 48,
+              fontWeight: FontWeight.w900,
+              color: Colors.black
+            )
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: widget.friends.map((friend) =>
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ListedProfileContainer(profile: friend, isFromOtherPage: true, removeFriend: widget.removeFriend,),
+                    ElevatedButton(
+                      onPressed: (){
+                        DocumentReference groupRef = FirebaseFirestore.instance.doc("group/${widget.group.group_id}");
+                        GroupFlyNotification notification = GroupFlyNotification(docId: '', requesterUid: _auth.currentUser!.uid, requesteeUid: friend.uid!, type: "group_invite", groupRef: groupRef);
+                        GetIt.instance<RepositoryService>().sendGroupInviteNotification(notification);
+                      }, 
+                      child: const Text("Invite",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Mulish'
+                        )
+                      )
+                    )
+                  ]
                 )
-              ) : Container()
-            ],
-          )
-        ).toList(),
+              ,).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }

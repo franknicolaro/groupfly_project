@@ -1,27 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/services/authorization_service.dart';
+import 'package:groupfly_project/services/repository_service.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/general_profile_widget.dart';
 
+import '../../models/FriendList.dart';
 import '../../models/group_fly_user.dart';
 
 class ListedProfileContainer extends StatefulWidget{
   GroupFlyUser profile;
-  bool isFromGroupPage;
-  ListedProfileContainer({required this.profile, required this.isFromGroupPage});
+  bool isFromOtherPage;
+  Function removeFriend;
+  ListedProfileContainer({required this.profile, required this.isFromOtherPage, required this.removeFriend});
   @override
   State<ListedProfileContainer> createState() => _ListedProfileContainerState();
 }
 class _ListedProfileContainerState extends State<ListedProfileContainer>{
+  Authorization _auth = Authorization();
+  FriendList? friends;
   @override
   Widget build(BuildContext context){
     return OutlinedButton(
       onPressed: (){
-        showModalBottomSheet(
-          isScrollControlled: true,
-          context: context, 
-          builder: ((builder) => displayUserProfile())
-        );
+        GetIt.instance<RepositoryService>().getFriendsByUID(widget.profile.uid!).then((value) {
+          friends = value;
+          showModalBottomSheet(
+            isScrollControlled: true,
+            context: context, 
+            builder: ((builder) => displayUserProfile())
+          );
+        });
       },
-      //TODO: add some type of action to this to display the bottom sheet.
       child: Container(
         height: MediaQuery.of(context).size.height * 0.12,
         width: MediaQuery.of(context).size.width * 0.25,
@@ -61,7 +70,7 @@ class _ListedProfileContainerState extends State<ListedProfileContainer>{
   Widget displayUserProfile(){
     return Container(
       color: Color.fromARGB(255, 17, 127, 171),
-      child: GeneralProfileWidget(user: widget.profile, isFromGroupPage: widget.isFromGroupPage,)
+      child: GeneralProfileWidget(user: widget.profile, isFromOtherPage: widget.isFromOtherPage, isCurrentUserFriend: friends!.friend_uids.contains(_auth.currentUser!.uid), friends: friends!, removeFriend: widget.removeFriend)
     );
   }
 }

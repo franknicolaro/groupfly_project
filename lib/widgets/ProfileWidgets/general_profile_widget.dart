@@ -1,12 +1,17 @@
+import 'dart:js_interop';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/services/validation_service.dart';
+import 'package:groupfly_project/widgets/FriendsWidgets/user_friend_list_widget.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/post_creation_group_container.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/profile_picture.dart';
 import 'package:groupfly_project/widgets/ProfileWidgets/user_post_list_widget.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../models/FriendList.dart';
 import '../../models/Group.dart';
 import '../../models/Post.dart';
 import '../../models/group_fly_user.dart';
@@ -19,14 +24,18 @@ import 'ProfileLabels/username_label.dart';
 
 class GeneralProfileWidget extends StatefulWidget{
   GroupFlyUser user;
-  bool isFromGroupPage;
-  GeneralProfileWidget({required this.user, required this.isFromGroupPage});
+  FriendList friends;
+  bool isFromOtherPage;
+  bool isCurrentUserFriend;
+  Function removeFriend;
+  GeneralProfileWidget({required this.user, required this.isFromOtherPage, required this.isCurrentUserFriend, required this.friends, required this.removeFriend});
   @override
   State<GeneralProfileWidget> createState() => _GeneralProfileWidgetState();
 }
 
 class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
-  Authorization _auth = Authorization();
+  final Authorization _auth = Authorization();
+  final ValidationService _validation = ValidationService();
   FirebaseStorage storage = FirebaseStorage.instance;
   PickedFile? _imageFile;
   final ImagePicker _imagePicker = ImagePicker();
@@ -38,13 +47,25 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
   List<Post> posts = [];
   String? tempUrl;
   List<Group> groups = [];
+  List<GroupFlyUser> friends = [];
+  FriendList? list;
   late bool isProfileOfCurrentUser;
+  late bool isCurrentUserFriend;
+  String error = "";
   @override
-  void initState(){
+  void initState() {
     super.initState();
     initPosts();
     initGroups();
     isProfileOfCurrentUser = widget.user.uid == _auth.currentUser!.uid;
+    initFriends();
+  }
+  //TODO: add "addFriend" button to send a notification.
+
+  void refresh(){
+    setState(() {
+      
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -53,7 +74,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
         child: Column(
           children: [
             Visibility(
-              visible: !isProfileOfCurrentUser || widget.isFromGroupPage,
+              visible: !isProfileOfCurrentUser || widget.isFromOtherPage,
               child: Container(
                 alignment: Alignment.topLeft,
                 child: BackButton(
@@ -94,10 +115,60 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
             ),
             UsernameLabel(user: widget.user),
             Center(
+              child: !isProfileOfCurrentUser ?
+                (widget.isCurrentUserFriend ?
+                  ElevatedButton(
+                    onPressed: (){
+                      GetIt.instance<RepositoryService>().removeFriend(_auth.currentUser!.uid, widget.user.uid!).then((_) {
+                        GetIt.instance<RepositoryService>().removeFriend(widget.user.uid!, _auth.currentUser!.uid).then((_){
+                          widget.removeFriend(widget.user.uid!);
+                          Navigator.of(context).pop();
+                        });
+                      });
+                    }, 
+                    child: Text("Remove Friend",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Mulish'
+                      )
+                    )
+                  ) :
+                  ElevatedButton(
+                    onPressed: (){
+                      GetIt.instance<RepositoryService>().sendFriendRequestNotification(_auth.currentUser!.uid, widget.user.uid!);
+                    }, 
+                    child: Text("Send Friend Request",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Mulish'
+                      )
+                    )
+                  )
+                ) : null
+            ),
+            Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FriendCountLabel(user: widget.user),
+                  FriendCountLabel(friends: widget.friends),
+                  SizedBox(width:15),
+                  ElevatedButton(
+                    onPressed: (){
+                      refreshFriends().then((value) {
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context, 
+                          builder: ((builder) => displayFriendsOfUser())
+                        );
+                      });
+                    }, 
+                    child: Text("View Friends",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Mulish'
+                      )
+                    )
+                  ),
                   SizedBox(width: MediaQuery.of(context).size.width * 0.1015),
                   NumberOfGroupsLabel(numberOfGroups: groups.length),
                   SizedBox(width: MediaQuery.of(context).size.width * 0.1015),
@@ -146,6 +217,36 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
       });
     });
   }
+  Future<void> initFriends() async{
+    GetIt.instance<RepositoryService>().getFriendsByUID(widget.user.uid!).then(((friendList) {
+      setState(() {
+        list = friendList;
+        for(String uid in friendList.friend_uids){
+          GetIt.instance<RepositoryService>().getGroupFlyUserByUID(uid).then((friend){
+            friends.add(friend);
+          });
+        }
+      });
+    }));
+  }
+  Future<void> refreshFriends() async{
+    FriendList? doNotAddAgain;
+    if(!list.isNull){
+      doNotAddAgain = list!;
+    }
+    GetIt.instance<RepositoryService>().getFriendsByUID(widget.user.uid!).then(((friendList) {
+      setState(() {
+        list = friendList;
+        for(String uid in friendList.friend_uids){
+          if(!doNotAddAgain.isNull && !doNotAddAgain!.friend_uids.contains(uid)){
+            GetIt.instance<RepositoryService>().getGroupFlyUserByUID(uid).then((friend){
+              friends.add(friend);
+            });
+          }
+        }
+      });
+    }));
+  }
   void takePhoto(ImageSource source) async{
     selectedFile = await _imagePicker.pickImage(
       source: source,
@@ -182,6 +283,15 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
       });
     });
   }
+  void removeFriend(String uid){
+    setState(() {
+      friends.removeWhere((user) => user.uid! == uid);
+      widget.removeFriend(uid);
+    });
+  }
+  Widget displayFriendsOfUser(){
+    return UserFriendListWidget(friends: friends, removeFriend: removeFriend, friendList: widget.friends, user: widget.user);
+  }
   Widget postPopUp(){
     return Container(
       color: Color.fromARGB(255, 17, 127, 171),
@@ -189,6 +299,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
+          //TODO: Change this to back button.
           ElevatedButton(
             onPressed: (){
               Navigator.pop(context);
@@ -214,6 +325,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
                 icon: Icon(Icons.camera_alt),
                 onPressed: (){
                   takePostPhoto(ImageSource.camera);
+                  refresh();
                 },
                 label: Text("Take a photo"),
               ),
@@ -221,6 +333,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
                 icon: Icon(Icons.image),
                 onPressed:(){
                   takePostPhoto(ImageSource.gallery);
+                  refresh();
                 },
                 label: Text("Choose a photo")
               )
@@ -240,6 +353,7 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
                     setState(() {
                       selectedGroup = group;
                     });
+                    refresh();
                   },
                   child: PostCreationGroupContainer(group: group)
                 )
@@ -262,6 +376,9 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
           ElevatedButton(
             onPressed: () {
               setState(() {
+                if(!_validation.validPost(selectedGroup!, fileToPost!)){
+                  error = "Please provide an image and group before posting.";
+                }
                 //TODO: add errors if user hasn't selected a photo or group.
                 DocumentReference refToGroup = FirebaseFirestore.instance.doc("group/${selectedGroup!.group_id}");
                 uploadPostImageAndAddPost(refToGroup);
@@ -269,6 +386,14 @@ class _GeneralProfileWidgetState extends State<GeneralProfileWidget>{
               });
             }, 
             child: Text("Create Post")
+          ),
+          Text(error,
+            style: TextStyle(
+              color: Colors.red,
+              fontFamily: "Mulish",
+              fontWeight: FontWeight.w500,
+              fontSize: 14
+            ),
           )
         ],
       )

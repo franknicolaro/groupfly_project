@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
+import 'package:groupfly_project/widgets/NotificationWidgets/notification_list.dart';
 
+import '../../models/GroupFlyNotification.dart';
 import '../../models/Post.dart';
 import '../ProfileWidgets/user_post_list_widget.dart';
 
 class HomeFeedWidget extends StatefulWidget{
   GroupFlyUser user;
   List<Post> mostRecentPosts;
-  HomeFeedWidget({super.key, required this.user, required this.mostRecentPosts});
+  List<GroupFlyNotification> notifications;
+  Function removeNotification;
+  HomeFeedWidget({super.key, required this.user, required this.mostRecentPosts, required this.notifications, required this.removeNotification});
 
   @override
   State<HomeFeedWidget> createState() => _HomeFeedWidgetState();
@@ -19,6 +23,10 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
   void initState(){
     super.initState();
     setState(() => posts = widget.mostRecentPosts);
+  }
+
+  void removeNotification(GroupFlyNotification notification){
+    widget.removeNotification(notification);
   }
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,11 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
         actions:[
           TextButton.icon(
             onPressed:(){
-              //Display notifications widget
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context, 
+                builder: ((builder) => displayNotificationList())
+              );
             },
             icon: const Icon(Icons.add_alert_sharp),
             label: const Text("Notifications")
@@ -63,5 +75,8 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
       ),
     );
   }
-
+  
+  Widget displayNotificationList(){
+    return NotificationList(notifications: widget.notifications, removeNotification: removeNotification);
+  }
 }

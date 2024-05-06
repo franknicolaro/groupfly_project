@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:groupfly_project/models/group_fly_user.dart';
 
+import '../../models/FriendList.dart';
 import '../../models/Group.dart';
 import '../../models/Hobby.dart';
 import '../../services/repository_service.dart';
 import '../GroupWidgets/listed_group_container.dart';
 
 class GroupExplorerWidget extends StatefulWidget{
-  GroupExplorerWidget({super.key});
+  List<GroupFlyUser> friendList;
+  Function removeFriend;
+  GroupExplorerWidget({super.key, required this.friendList, required this.removeFriend});
   @override
   State<GroupExplorerWidget> createState() => _GroupExplorerWidgetState();
 }
@@ -40,6 +44,10 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
     hobbyFilter = DEFAULT_HOBBY;
     locationFilter = DEFAULT_LOCATION;
     selectableHobbies = GetIt.instance<RepositoryService>().getAllHobbies();
+  }
+
+  void removeFriend(String uid){
+    widget.removeFriend(uid);
   }
   @override
   Widget build(BuildContext context){
@@ -121,7 +129,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
               child: Column(
                 children:  
                   groups.map((group) =>
-                    group.isActive ? ListedGroupContainer(group: group) : Container()
+                    group.isActive ? ListedGroupContainer(group: group, friends: widget.friendList, removeFriend: removeFriend,) : Container()
                   ).toList(),
               ),
             )
