@@ -9,40 +9,53 @@ import '../../models/Post.dart';
 import '../../models/group_fly_user.dart';
 import 'likes_and_comments_widget.dart';
 
+//A class that displays a post information.
 class PostContainer extends StatefulWidget{
-  Post post;
-  GroupFlyUser user;
+  Post post;              //The post to be displayed.
+  GroupFlyUser user;      //The current user, passed through into the LikesAndCommentsWidget.
   PostContainer({required this.post, required this.user});
   @override
   State<PostContainer> createState() => _PostContainerState();
 }
 
 class _PostContainerState extends State<PostContainer>{
-  ImageStorageService _storage = ImageStorageService();
+  //ImageStorageService for retrieving images and 
+  //FirebaseStorage instance, used to upload images to Firebase.
+  final ImageStorageService _storage = ImageStorageService();
   FirebaseStorage fbStorage = FirebaseStorage.instance;
-  var imageUrl;
-  var groupAsFuture;
-  String? url;
+
+  var imageUrl;       //The url of the image to be displayed.
+  var groupAsFuture;  //The group that the post is in reference to as a future variable.
+  String? url;        //Non-future version of the url.
+
+  //Initialize the State and the "future" variables for their respective FutureBuilders
   @override
   void initState(){
     super.initState;
     initImageUrl();
     initGroup();
   }
+
+  //Initializes the "future" url variable.
   void initImageUrl() {
     imageUrl = _storage.getImageUrlFromStorage(fbStorage.ref().child(widget.post.imageUrl));
   }
+
+  //Initializes the "future" group variable.
   void initGroup(){
     groupAsFuture = GetIt.instance<RepositoryService>().getGroupByPostReference(widget.post.groupRef);
   }
+
+  //Builds the PostContainer.
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Center(
+          //Container used as the background of the post.
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.34, //0.4
-            width: MediaQuery.of(context).size.width * 0.55, //0.58
+            height: MediaQuery.of(context).size.height * 0.34,
+            width: MediaQuery.of(context).size.width * 0.55,
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 21, 153, 206),
               borderRadius: BorderRadius.circular(10.0),
@@ -51,6 +64,7 @@ class _PostContainerState extends State<PostContainer>{
               children: [
                 Row(
                   children: [
+                    //Container to hold the image.
                     Container(
                       alignment: Alignment.topLeft,
                       child:FutureBuilder(
@@ -79,6 +93,7 @@ class _PostContainerState extends State<PostContainer>{
                         })
                       ),
                     ),
+                    //FutureBuilder which holds data about the group.
                     FutureBuilder(
                       future: groupAsFuture,
                       builder: ((context, snapshot) {
@@ -95,6 +110,7 @@ class _PostContainerState extends State<PostContainer>{
                             return Expanded(
                               child: Column(
                                 children: [
+                                  //Group title label for the reference to the group.
                                   Container(
                                     child: Text(
                                       'From: ${group.title}',
@@ -106,12 +122,14 @@ class _PostContainerState extends State<PostContainer>{
                                       )
                                     ),
                                   ),
+                                  //When the group met. 
                                   Container(
                                     child: Text(
                                       'On ${group.meeting_time.month}/${group.meeting_time.day}/${group.meeting_time.year}'
                                     )
                                   ),
                                   const SizedBox(height: 5),
+                                  //Description of the post.
                                   Text(
                                     widget.post.description
                                   )
@@ -127,6 +145,7 @@ class _PostContainerState extends State<PostContainer>{
                     )
                   ]
                 ),
+                //The LikesAndCommentsWidget (see likes_and_comments_widget.dart)
                 LikesAndCommentsWidget(
                   likes: widget.post.likesByUid,
                   comments: widget.post.comments,

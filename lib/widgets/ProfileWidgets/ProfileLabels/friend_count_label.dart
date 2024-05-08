@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/FriendList.dart';
-import '../../../services/authorization_service.dart';
 
+//A label for the number of friends of the user.
 class FriendCountLabel extends StatefulWidget{
-  //GroupFlyUser user;
-  FriendList friends;
+  FriendList friends;       //The FriendList of the user, which holds a list of friend uids.
   FriendCountLabel({required this.friends});
   @override
   State<FriendCountLabel> createState() => _FriendCountLabelState();
 }
 
 class _FriendCountLabelState extends State<FriendCountLabel>{
-  Authorization _auth = Authorization();
-  var friends;
-
-  @override
-  void initState(){
-    super.initState();
-  }
-
-  void initFriends(){
-    //friends = GetIt.instance<RepositoryService>().getFriendsByUID(widget.user.uid!);
-  }
-
+  //Builds the label by passing the FriendList through and using the length of the list.
   @override
   Widget build(BuildContext context){
     return Text(

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:groupfly_project/models/GroupFlyNotification.dart';
 import 'package:groupfly_project/widgets/NotificationWidgets/listed_notification_container.dart';
 
+//Class for the list of notifications, displayed 
+//after clicking the notifications button 
+//on the user's home feed.
 class NotificationList extends StatefulWidget{
-  List<GroupFlyNotification> notifications;
-  Function removeNotification;
+  List<GroupFlyNotification> notifications; //List of notification
+  Function removeNotification;              //The removeNotification function, passed from AppController.
   NotificationList({super.key, required this.notifications, required this.removeNotification});
 
   @override
@@ -12,18 +15,13 @@ class NotificationList extends StatefulWidget{
 }
 
 class _NotificationListState extends State<NotificationList>{
-  List<GroupFlyNotification> notifList = [];
+  //Initializes the local list of notifications.
   @override
   void initState() {
     super.initState();
-    notifList.addAll(widget.notifications);
   }
-  void removeNotification(GroupFlyNotification notification){
-    widget.removeNotification(notification);
-    setState(() {
-      
-    });
-  }
+
+  //Builds the NotificationList
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -31,6 +29,7 @@ class _NotificationListState extends State<NotificationList>{
       child: Center(
         child: Column(
           children: [
+            //BackButton to remove NotificationList from display
             Container(
               alignment: Alignment.topLeft,
               child: BackButton(
@@ -39,8 +38,9 @@ class _NotificationListState extends State<NotificationList>{
                 },
               ),
             ),
-            SizedBox(width: 15), //TODO: just get rid of this. it doesn't do anything bc of width.
-            Text("Notifications",
+            SizedBox(height: 15), 
+            //Title label for notifications.
+            const Text("Notifications",
               style:TextStyle(
                 color: Colors.black,
                 fontSize: 48,
@@ -48,14 +48,15 @@ class _NotificationListState extends State<NotificationList>{
                 fontFamily: 'Mulish',
               )
             ),
-            SizedBox(width: 15), //TODO: just get rid of this. it doesn't do anything bc of width.
+            SizedBox(height: 15), 
+            //Scroll view of ListedNotificationContainers based on the list of notifications.
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: 
                     widget.notifications.map((notification) =>
                       Center(
-                        child: ListedNotificationContainer(notification: notification, removeNotification: removeNotification,)
+                        child: ListedNotificationContainer(notification: notification, removeNotification: widget.removeNotification,)
                       )
                     ).toList(),
                 )

@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+//Group model.
 class Group{
   final String group_id;
   final String owner_uid;
@@ -15,6 +16,7 @@ class Group{
 
   Group({required this.group_id, required this.owner_uid, required this.title, required this.hobbyName, required this.location, required this.notes, required this.member_uids, required this.meeting_time, required this.isActive, required this.maxCapacity});
 
+  //Obtains data from a Firebase Snapshot and returns a Group object.
   factory Group.fromDB(DocumentSnapshot<Map<String, dynamic>> snapshot,
   SnapshotOptions? options,){
     final map = snapshot.data();
@@ -32,6 +34,7 @@ class Group{
     );
   }
   
+  //Maps the current Group object to a map which would be passed through to a Repository
   Map<String, dynamic> toMap(){
     return {
       'owneruid': owner_uid,

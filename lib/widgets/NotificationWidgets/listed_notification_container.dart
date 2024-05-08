@@ -9,7 +9,9 @@ import 'friend_request_widget.dart';
 import 'group_invite_widget.dart';
 import 'group_request_widget.dart';
 
+//A class to display a listed notification.
 class ListedNotificationContainer extends StatefulWidget{
+  //The notification, along with the removeNotification function passed from the AppController.
   GroupFlyNotification notification;
   Function removeNotification;
   ListedNotificationContainer({required this.notification, required this.removeNotification});
@@ -19,17 +21,18 @@ class ListedNotificationContainer extends StatefulWidget{
 }
 
 class _ListedNotificationContainerState extends State<ListedNotificationContainer>{
+  //The user that is requesting the current user in the notification
   GroupFlyUser? requester;
+
+  //The group in reference to the notification (if necessary).
   Group? referencedGroup;
   @override
   void initState(){
     super.initState();
-
     initVariables();
   }
-  void removeNotification(GroupFlyNotification notification){
-    widget.removeNotification(notification);
-  }
+  //Initialize the requester and the group that the 
+  //notification is in reference to (if necessary)
   void initVariables(){
     if(widget.notification.type =="friend_request"){
       GetIt.instance<RepositoryService>().getGroupFlyUserByUID(widget.notification.requesterUid).then((user){
@@ -49,8 +52,10 @@ class _ListedNotificationContainerState extends State<ListedNotificationContaine
       });
     }
   }
+  //Builds the ListedNotificationContainer.
   @override
   Widget build(BuildContext context) {
+    //Button which displays the notification, based on the notification's type.
     return OutlinedButton(
       onPressed: (){
         widget.notification.type == "friend_request" ? 
@@ -69,9 +74,8 @@ class _ListedNotificationContainerState extends State<ListedNotificationContaine
           context: context, 
           builder: ((builder) => displayGroupInvite())
         );
-        //TODO: Bottom modal sheet that displays a different widget depending on the request. 
-
       }, 
+      //Displays a label, with the title depending on the notification.
       child: Container(
         height: MediaQuery.of(context).size.height * 0.12,
         width: MediaQuery.of(context).size.width * 0.25,
@@ -99,29 +103,31 @@ class _ListedNotificationContainerState extends State<ListedNotificationContaine
       )
     );
   }
+  //Displays the FriendRequestWidget, initializing the variables if necessary.
   Widget displayFriendRequest(){
     if(requester == null){
       setState(() {
         initVariables();
       });
     }
-    return FriendRequestWidget(notification: widget.notification, user: requester!, removeNotification: removeNotification);
+    return FriendRequestWidget(notification: widget.notification, user: requester!, removeNotification: widget.removeNotification);
   }
+  //Displays the GroupRequestWidget, intializing the variables if necessary.
   Widget displayGroupRequest(){
     if(requester == null || referencedGroup == null){
       setState(() {
         initVariables();
       });
     }
-    print(requester);
-    return GroupRequestWidget(user: requester!, group: referencedGroup!, notification: widget.notification, removeNotification: removeNotification);
+    return GroupRequestWidget(user: requester!, group: referencedGroup!, notification: widget.notification, removeNotification: widget.removeNotification);
   }
+  //Displays the GroupInviteWidget, intializing the variables if necessary.
   Widget displayGroupInvite(){
     if(requester == null || referencedGroup == null){
       setState(() {
         initVariables();
       });
     }
-    return GroupInviteWidget(user: requester!, group: referencedGroup!, notification: widget.notification, removeNotification: removeNotification);
+    return GroupInviteWidget(user: requester!, group: referencedGroup!, notification: widget.notification, removeNotification: widget.removeNotification);
   }
 }

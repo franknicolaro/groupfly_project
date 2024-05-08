@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/Group.dart';
 
+//A class that holds the container for groups in the post creation form.
 class PostCreationGroupContainer extends StatefulWidget{
   Group group;
   PostCreationGroupContainer({required this.group});
@@ -10,6 +11,8 @@ class PostCreationGroupContainer extends StatefulWidget{
 }
 
 class _PostCreationGroupContainer extends State<PostCreationGroupContainer>{
+  //Builds the PostCreationGroupContainer, which is a container holding 
+  //the title of the group.
   @override
   Widget build(BuildContext context) {
     return Center(

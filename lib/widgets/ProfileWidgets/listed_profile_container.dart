@@ -7,19 +7,26 @@ import 'package:groupfly_project/widgets/ProfileWidgets/general_profile_widget.d
 import '../../models/FriendList.dart';
 import '../../models/group_fly_user.dart';
 
+//A class that displays a profile in a concise container.
 class ListedProfileContainer extends StatefulWidget{
-  GroupFlyUser profile;
-  bool isFromOtherPage;
-  Function removeFriend;
+  GroupFlyUser profile;     //The profile that the container pertains to.
+  bool isFromOtherPage;     //Boolean passed down from ProfileExplorer, GroupWidget, or UserFriendList.
+  Function removeFriend;    //removeFriend function passed from AppController
   ListedProfileContainer({required this.profile, required this.isFromOtherPage, required this.removeFriend});
   @override
   State<ListedProfileContainer> createState() => _ListedProfileContainerState();
 }
 class _ListedProfileContainerState extends State<ListedProfileContainer>{
-  Authorization _auth = Authorization();
+  //Authorization service for checking if the profile is friends with the current user.
+  final Authorization _auth = Authorization();
+
+  //FriendList for passing into GeneralProfileWidget.
   FriendList? friends;
+
+  //Builds the ListedProfileContainer
   @override
   Widget build(BuildContext context){
+    //Button which displays the user profile when clicked.
     return OutlinedButton(
       onPressed: (){
         GetIt.instance<RepositoryService>().getFriendsByUID(widget.profile.uid!).then((value) {
@@ -40,6 +47,7 @@ class _ListedProfileContainerState extends State<ListedProfileContainer>{
         ),
         child: Row(
           children: [
+            //Displays profile picture within the profile container
             Container(
               alignment: Alignment.centerLeft,
               child: CircleAvatar(
@@ -51,6 +59,7 @@ class _ListedProfileContainerState extends State<ListedProfileContainer>{
                 )
               )
             ),
+            //Profile username label
             Container(
               child: Text(
                 widget.profile.username,

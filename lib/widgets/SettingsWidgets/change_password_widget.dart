@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 import 'package:groupfly_project/services/validation_service.dart';
 
+//A class that allows the current user to change their password.
 class ChangePasswordWidget extends StatefulWidget{
   ChangePasswordWidget({super.key});
 
@@ -10,19 +11,28 @@ class ChangePasswordWidget extends StatefulWidget{
 }
 
 class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
+  //Authorization service to update the password.
   final Authorization _auth = Authorization();
+
+  //Validation service to validate the new password.
   final ValidationService _validation = ValidationService();
+
+  //The key for the Form
   final _formKey = GlobalKey<FormState>();
 
+  //Strings to keep track of the old password, new password, and error message.
   String oldPassword = '';
   String newPassword = '';
   String error = '';
+
+  //Builds the ChangePasswordWidget
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Color.fromARGB(255, 10, 70, 94),
       child: Column(
         children: [
+          //Back button to remove the ChangePasswordWidget from display
           Container(
             alignment: Alignment.topLeft,
             child: BackButton(
@@ -31,11 +41,13 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
               },
             )
           ),
+          //Form to enter the old and new passwords
           Form(
             key: _formKey,
             child: Column(
               children: [
                 const SizedBox(height: 20),
+                //Label and TextField for old password
                 const Text('Old Password',
                   style: TextStyle(
                     color: Colors.black,
@@ -53,6 +65,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
                   },
                 ),
                 const SizedBox(height: 20),
+                //Label and TextField for new password
                 const Text('New Password',
                   style: TextStyle(
                     color: Colors.black,
@@ -69,9 +82,13 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
                     setState(() => newPassword = value);
                   },
                 ),
+                //Submit button to change the password.
                 ElevatedButton(
                   onPressed: () async {
                     _formKey.currentState!.save();
+                    //Checks if the passwords match after validating. If they do,
+                    //display the error message. If not, then change the password, then remove
+                    //ChangePasswordWIdget from display.
                     if(_formKey.currentState!.validate()){
                       if(oldPassword == newPassword){
                         setState(() {
@@ -98,6 +115,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
                   )
                 ),
                 SizedBox(height: 15),
+                //Error label.
                 Text(error, style: TextStyle(color: Colors.red, fontSize: 14))
               ],
             )

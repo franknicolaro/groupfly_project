@@ -13,17 +13,26 @@ class LoginController extends StatefulWidget {
 }
 
 class _LoginControllerState extends State<LoginController> {
-  String currentPage = "login";
-  List<Hobby> selectedHobbies =[];
+  String currentPage = "login";     //Keeps track of the current page, which determines what is displayed.
+  List<Hobby> selectedHobbies =[];  //Holds the selected hobbies, which is passed through to the VerifyAccountScreen.
+
+  //Sets the currentPage to the page String that was passed through from the current displayed screen.
   void switchView(String page) {
     setState(() => currentPage = page);
   } 
+
+  //Sets the selectedHobbies to a List of Hobbies, which is to be inserted upon verification of the user.
   void setHobbies(List<Hobby> hobbies){
     setState(() => selectedHobbies = hobbies);
   }
 
   @override
   Widget build(BuildContext context) {
+    //Displays a screen based on the following logic:
+    //  1) "login": LoginScreen
+    //  2) "register": RegisterScreen
+    //  3) "verify": VerifyAccountScreen
+    //  4) Otherwise, display an error Text.
     if(currentPage == "login"){
       return LoginScreen(switchView: switchView);
     }

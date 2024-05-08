@@ -6,11 +6,13 @@ import '../../models/GroupFlyNotification.dart';
 import '../../models/Post.dart';
 import '../ProfileWidgets/user_post_list_widget.dart';
 
+//Class that displays the home feed, which includes the notifications button
+//and a list of the most recent posts of friends.
 class HomeFeedWidget extends StatefulWidget{
-  GroupFlyUser user;
-  List<Post> mostRecentPosts;
-  List<GroupFlyNotification> notifications;
-  Function removeNotification;
+  GroupFlyUser user;                        //The current GroupFlyUser.
+  List<Post> mostRecentPosts;               //The most recent posts from the AppController.
+  List<GroupFlyNotification> notifications; //Notifications of the user.
+  Function removeNotification;              //removeNotification function passed through from AppController.
   HomeFeedWidget({super.key, required this.user, required this.mostRecentPosts, required this.notifications, required this.removeNotification});
 
   @override
@@ -18,18 +20,24 @@ class HomeFeedWidget extends StatefulWidget{
 }
 
 class _HomeFeedWidgetState extends State<HomeFeedWidget>{
+  //A local list of most recent posts.
   List<Post> posts = [];
+
   @override
   void initState(){
     super.initState();
     setState(() => posts = widget.mostRecentPosts);
   }
 
+  //Removes the specified notification the notification list in the AppController.
   void removeNotification(GroupFlyNotification notification){
     widget.removeNotification(notification);
   }
+
+  //Builds the HomeFeedWidget.
   @override
   Widget build(BuildContext context) {
+    //Updates the UI before returning the Scaffold.
     setState(() {
       
     });
@@ -39,6 +47,7 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
         backgroundColor: Color.fromARGB(255, 61, 111, 67),
         title: Text('Home Feed'),
         actions:[
+          //Button that displays the list of notifications.
           TextButton.icon(
             onPressed:(){
               showModalBottomSheet(
@@ -56,6 +65,7 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
         alignment: Alignment.center,
         child: Column(
           children: [
+            //Label explaining the list of posts.
             const Text("Most recent posts from friends:",
               style: TextStyle(
                 color: Colors.black,
@@ -64,6 +74,7 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
                 fontFamily: 'Mulish'
               )
             ),
+            //Container holding the UserPostList (see user_post_list_widget.dart)
             Container(
               color: Color.fromARGB(255, 17, 127, 171),
               height: MediaQuery.of(context).size.height * 0.65,
@@ -76,6 +87,7 @@ class _HomeFeedWidgetState extends State<HomeFeedWidget>{
     );
   }
   
+  //Displays a NotificationList(see notification_list.dart)
   Widget displayNotificationList(){
     return NotificationList(notifications: widget.notifications, removeNotification: removeNotification);
   }

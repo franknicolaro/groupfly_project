@@ -1,15 +1,18 @@
-import 'dart:js_util';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groupfly_project/models/GroupFlyNotification.dart';
 
 import '../DAOs/NotificationDAO.dart';
 import '../services/authorization_service.dart';
 
+//Implementation of NotificationDAO
 class NotificationRepo implements NotificationDao{
+  //Instance of Firestore
   final FirebaseFirestore firebaseDB = FirebaseFirestore.instance;
+
+  //Authorization for obtaining references for the required groupRef.
   Authorization _auth = Authorization();
 
+  //Returns all Friend Request notifications.
   Future<List<GroupFlyNotification>> _getFriendRequests(String requesteeUid) async {
     List<GroupFlyNotification> friendRequests = [];
     CollectionReference friendReqCol = firebaseDB.collection('friend_request');
@@ -29,6 +32,7 @@ class NotificationRepo implements NotificationDao{
     return friendRequests;
   }
 
+  //Returns all Group Request notificaitons
   Future<List<GroupFlyNotification>> _getGroupRequests(String requesteeUid) async {
     List<GroupFlyNotification> groupRequests = [];
     CollectionReference groupReqCol = firebaseDB.collection('group_request');
@@ -47,6 +51,8 @@ class NotificationRepo implements NotificationDao{
     });
     return groupRequests;
   }
+
+  //Returns all Group Invite notifications.
   Future<List<GroupFlyNotification>> _getGroupInvites(String requesteeUid) async {
     List<GroupFlyNotification> groupInvites = [];
     CollectionReference groupInvCol = firebaseDB.collection('group_invite');
@@ -65,6 +71,9 @@ class NotificationRepo implements NotificationDao{
     });
     return groupInvites;
   }
+
+  //Returns all notifications, calling all private getter 
+  //methods for each type of notification.
   @override
   Future<List<GroupFlyNotification>> getAllNotificationsByRequesteeUid(String requesteeUid) async {
     List<GroupFlyNotification> notifications = [];
@@ -73,6 +82,8 @@ class NotificationRepo implements NotificationDao{
     notifications.addAll(await _getGroupInvites(requesteeUid));
     return notifications;
   }
+
+  //Removes the provided notification from the respective collection.
   @override
   Future<void> removeNotification(GroupFlyNotification notification)async {
     if(notification.type == "friend_request"){
@@ -86,6 +97,8 @@ class NotificationRepo implements NotificationDao{
     }
   }
   
+  //Creates and adds a group request notification
+  //to the friend_request collection.
   @override
   Future<void> sendFriendRequestNotification(String requesterUid, String requesteeUid) async{
     firebaseDB.collection('friend_request').doc().set(
@@ -95,6 +108,9 @@ class NotificationRepo implements NotificationDao{
       }
     ).onError((error, stackTrace) => "Error adding notification to Firestore: $error");
   }
+
+  //Creates and adds a group request notification
+  //to the group_request collection.
   @override
   Future<void> sendGroupRequestNotification(GroupFlyNotification notification) async{
     firebaseDB.collection('group_request').doc().set(
@@ -105,6 +121,9 @@ class NotificationRepo implements NotificationDao{
       }
     ).onError((error, stackTrace) => "Error adding notification to Firestore: $error");
   }
+
+  //Creates and adds a group invited notification
+  //to the group_invite collection.
   @override
   Future<void> sendGroupInviteNotification(GroupFlyNotification notification) async{
     firebaseDB.collection('group_invite').doc().set(

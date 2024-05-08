@@ -3,9 +3,12 @@ import 'package:groupfly_project/models/Group.dart';
 
 import '../DAOs/GroupDAO.dart';
 
+//Implementation of GroupDAO
 class GroupRepo implements GroupDao{
+  //Instance of Firestore
   final FirebaseFirestore firebaseDB = FirebaseFirestore.instance;
 
+  //Creates and inserts a Group into the "group" collection.
   @override
   Future<void> createGroup(Group group) async {
     firebaseDB.collection('group').doc().set({
@@ -20,6 +23,9 @@ class GroupRepo implements GroupDao{
       'title': group.title,
     }).onError((error, stackTrace) => "Error adding group to Firestore: $error");
   }
+
+  //Get all groups that a user is a member of (regardless of ownership) 
+  //based on the user's UID
   @override
   Future<List<Group>> getGroupsByMemberUID(String memberUID) async{
     CollectionReference groupCollection = firebaseDB.collection('group');
@@ -44,6 +50,8 @@ class GroupRepo implements GroupDao{
     });
     return groups;
   }
+
+  //Returns a Group based on a provided DocumentReference to that group.
   @override
   Future<Group> getGroupByPostReference(DocumentReference groupRef) async{
     Group? result;
@@ -56,6 +64,7 @@ class GroupRepo implements GroupDao{
     return result!;
   }
   
+  //Returns Groups based on the title of the group (for searching).
   @override
   Future<List<Group>> searchGroupsByName(String title) async{
     List<Group> groups = [];
@@ -81,12 +90,15 @@ class GroupRepo implements GroupDao{
     return groups;
   }
   
+  //Removes a member from a group given on the Group's document ID
   @override
   Future<void> removeMember(String memberUID, String groupId)async {
     firebaseDB.collection('group').doc(groupId).update({
       'members': FieldValue.arrayRemove([memberUID])
     });
   }
+
+  //Adds a member from a Group given on the Group's document ID
   @override
   Future<void> addMember(String memberUID, String groupId)async {
     firebaseDB.collection('group').doc(groupId).update({
@@ -94,11 +106,11 @@ class GroupRepo implements GroupDao{
     });
   }
 
+  //Disbands a Group at the given document ID
   @override
   Future<void> disbandGroup(String groupId)async {
     firebaseDB.collection('group').doc(groupId).update({
       'is_active': false
     });
   }
-  
 }

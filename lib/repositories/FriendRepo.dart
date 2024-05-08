@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groupfly_project/DAOs/FriendDAO.dart';
 import 'package:groupfly_project/models/FriendList.dart';
 
+//Implementation of FriendDAO
 class FriendRepo implements FriendDao{
+  //Instance of Firestore
   final FirebaseFirestore firebaseDB = FirebaseFirestore.instance;
 
+  //Initializes a Friend document for the user upon registration
   @override
   Future<void> initFriendDocument(String uid) async{
     firebaseDB.collection("friends").doc(uid).set(
@@ -13,9 +16,10 @@ class FriendRepo implements FriendDao{
       }
     ).onError((error, stackTrace) => "Error: could not create friend document");
   }
+
+  //Obtains all friends of the user based on the user's UID.
   @override
   Future<FriendList> getFriendsByUID(String uid) async{
-    print("getting friends by user uid...");
     CollectionReference friendCollection = firebaseDB.collection('friends');
     FriendList? friends;
     await friendCollection.doc(uid).get().then((snapshot) {
@@ -25,6 +29,9 @@ class FriendRepo implements FriendDao{
     });
     return friends!;
   }
+
+  //Removes a friend (based on their uid) from a user's friend document base
+  //based on their UID.
   @override
   Future<void> removeFriend(String uid, String frienduid) async {
     firebaseDB.collection("friends").doc(uid).update({
@@ -35,6 +42,9 @@ class FriendRepo implements FriendDao{
       });
     });
   }
+
+  //Adds a friend (based on their uid) from a user's friend document base
+  //based on their UID.
   @override
   Future<void> addFriend(String uid, String frienduid) async {
     firebaseDB.collection("friends").doc(uid).update({

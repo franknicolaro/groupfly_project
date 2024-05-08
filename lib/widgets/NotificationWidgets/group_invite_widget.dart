@@ -6,11 +6,12 @@ import 'package:groupfly_project/services/repository_service.dart';
 import '../../models/Group.dart';
 import '../../models/group_fly_user.dart';
 
+//Class that displays a group invite notification
 class GroupInviteWidget extends StatefulWidget{
-  GroupFlyUser user;
-  Group group;
-  GroupFlyNotification notification;
-  Function removeNotification;
+  GroupFlyUser user;                  //The user that is inviting the current user.
+  Group group;                        //The group that the invite is in reference to.
+  GroupFlyNotification notification;  //The notification of the group invite.
+  Function removeNotification;        //The removeNotification function passed from AppController.
   GroupInviteWidget({required this.group, required this.user, required this.removeNotification, required this.notification});
 
   @override
@@ -25,6 +26,7 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
       child: Center(
         child: Column(
           children: [
+            //Back button to remove GroupInviteWidget from display
             Container(
               alignment: Alignment.topLeft,
               child: BackButton(
@@ -33,8 +35,9 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
                 },
               )
             ),
-            SizedBox(width: 15), //TODO: just get rid of this. it doesn't do anything bc of width.
-            Text("Group Invite",
+            SizedBox(height: 15), 
+            //Group Invite title text.
+            const Text("Group Invite",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 48,
@@ -42,6 +45,7 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
                 fontFamily: 'Mulish'
               )
             ),
+            //Message indicating that a user wants to invite the current user to their group.
             Text("${widget.user.username} wants to invite you to their group.",
               style: TextStyle(
                 color: Colors.black,
@@ -50,6 +54,7 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
                 fontFamily: 'Mulish'
               )
             ),
+            //Title of the group
             Text("Title: ${widget.group.title}",
               style: TextStyle(
                 color: Colors.black,
@@ -58,6 +63,7 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
                 fontFamily: 'Mulish'
               )
             ),
+            //Date of the event.
             Text("Date of Event: ${widget.group.meeting_time}",
               style: TextStyle(
                 color: Colors.black,
@@ -70,6 +76,8 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                //Accept button, which adds the current user to the group, 
+                //then removes the notification and removes the GroupInviteWidget from display.
                 ElevatedButton(
                   onPressed: (){
                     GetIt.instance<RepositoryService>().addMember(widget.notification.requesteeUid, widget.group.group_id).then((_){
@@ -85,6 +93,8 @@ class _GroupInviteWidgetState extends State<GroupInviteWidget>{
                     )
                   )
                 ),
+                //Deny button, which denies the invite,  
+                //then removes the notification and removes the GroupInviteWidget from display.
                 ElevatedButton(
                   onPressed: (){
                     GetIt.instance<RepositoryService>().removeNotification(widget.notification).then((_){

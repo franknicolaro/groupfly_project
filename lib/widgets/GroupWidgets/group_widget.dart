@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -11,11 +9,12 @@ import 'package:groupfly_project/widgets/ProfileWidgets/listed_profile_container
 
 import '../../models/Group.dart';
 
+//A Widget that displays Group information
 class GroupWidget extends StatefulWidget{
-  Group group;
-  final Function notifyWidget;
-  List<GroupFlyUser> friends;
-  Function removeFriend;
+  Group group;                  //The group which has information to display
+  final Function notifyWidget;  //A function to notify the widget that this GroupWidget comes from.
+  List<GroupFlyUser> friends;   //List of the current user's friends.
+  Function removeFriend;        //removeFriend function from AppController.
   GroupWidget({required this.group, required this.notifyWidget, required this.friends, required this.removeFriend});
 
   @override
@@ -23,38 +22,22 @@ class GroupWidget extends StatefulWidget{
 }
 
 class _GroupWidgetState extends State<GroupWidget>{
+  //Authorization service, to confirm if the user is the owner of the group
   Authorization _auth = Authorization();
+
+  //Members of the Group, incluign the group owner.
   List<GroupFlyUser> members = [];
+
+  //Owner of the group.
   GroupFlyUser? owner;
 
-  /*TODO: Column:
-    Obligatory back button (trademarked) (copyright)
-    Title of the group
-    Row(Owner username, Number of members, Button to showModalSideSheet())
-      showModalSideSheet():
-        List of Rows(ListedProfileContainer, Add Friend Button(save this for later))
-    ChatContainer(worry about this after getting everything else done)
-      message logs, textfield with button to send message.
-    Join Group button if available spot is open, Leave Group if user is a part of group.
-      RequestButton could be done later
-      Same with InviteButton if user is owner. 
-      Also same with DisbandGroupButton.
-
-    Overall Execution:
-      - get the group owner first by uid.
-      - get other members by uid and add each into the list (ignore the owner's uid this time).
-      - store group owner at index 0 so they appear at the top of the side sheet list.
-      - update document in Firebase when a user joins or leaves the group. 
-
-    Holy fucking shit this is a lot and idk if i have the time for this
-    just don't panic frank
-    it's okay  
-  */ 
   @override
   void initState(){
     super.initState();
     initUsers();
   }
+
+  //Initializes the owner and members of the group to display.
   void initUsers() async{
     await GetIt.instance<RepositoryService>().getGroupFlyUserByUID(widget.group.owner_uid).then((user) {
         setState(() {
@@ -74,6 +57,10 @@ class _GroupWidgetState extends State<GroupWidget>{
       members.insert(0, owner!);
     });
   }
+
+  //Looks for the member in the group by the member's UID.
+  //Returns a nullable GroupFlyUser, regardless of if the user exists in the
+  //group or not.
   GroupFlyUser? findMemberWithUID(String uid){
     GroupFlyUser? result;
     members.forEach((member) {
@@ -83,17 +70,22 @@ class _GroupWidgetState extends State<GroupWidget>{
     });
     return result;
   }
+
+  //Updates the UI by calling setState((){})
   void refresh(){
     setState(() {
       
     });
   }
+
+  //Builds the GroupWidget
   @override
   Widget build(BuildContext context){
     return Container(
       color: Color.fromARGB(255, 17, 127, 171),
       child: Column(
         children: [
+          //BackButton to remove the widget and display what was originially displayed.
           Container(
             alignment: Alignment.topLeft,
             child: BackButton(
@@ -102,6 +94,7 @@ class _GroupWidgetState extends State<GroupWidget>{
               },
             )
           ),
+          //Text display the title of the group.
           Text(widget.group.title,
             style: const TextStyle(
               color: Colors.black,
@@ -113,6 +106,7 @@ class _GroupWidgetState extends State<GroupWidget>{
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              //Group Owner Label
               Text("Group owner: ${owner!.username}",
                 style: const TextStyle(
                   color: Colors.black,
@@ -122,6 +116,7 @@ class _GroupWidgetState extends State<GroupWidget>{
                 )
               ),
               const SizedBox(width: 50),
+              //Number of members label.
               Text("Number of Members: ${members.length}/${widget.group.maxCapacity}",
                 style: const TextStyle(
                   color: Colors.black,
@@ -133,6 +128,7 @@ class _GroupWidgetState extends State<GroupWidget>{
               const SizedBox(width: 15),
             ],
           ),
+          //The list of members, both with the label and the memberList()
           const Text("Members:",
             style: TextStyle(
               color: Colors.black,
@@ -147,10 +143,12 @@ class _GroupWidgetState extends State<GroupWidget>{
             color: Color.fromARGB(255, 10, 70, 94),
             child: memberList(),
           ),
+          //If the current user is not the owner, then display a request to join group button.
           _auth.currentUser!.uid != owner!.uid ? 
           Visibility(
             visible: findMemberWithUID(_auth.currentUser!.uid) == null,
             child: ElevatedButton(
+              //Creates a Group Request notification and stores it into firebase.
               onPressed: (){
                 DocumentReference refToGroup = FirebaseFirestore.instance.doc("group/${widget.group.group_id}");
                 GroupFlyNotification notificationToInsert = GroupFlyNotification(requesteeUid: owner!.uid!, requesterUid: _auth.currentUser!.uid, groupRef: refToGroup, type: 'group_request', docId: "");
@@ -166,9 +164,10 @@ class _GroupWidgetState extends State<GroupWidget>{
               ),
             ),
           ) : 
+          //Button to invite friends to the group, but only if the user is the group owner
           ElevatedButton(
             onPressed: (){
-              //Invite friends to group
+              //Displays a widget that allows for the inviting of friends to the group.
               showModalBottomSheet(
                 isScrollControlled: true,
                 context: context,
@@ -185,11 +184,13 @@ class _GroupWidgetState extends State<GroupWidget>{
             )
           ),
           _auth.currentUser!.uid != owner!.uid ? 
+          //Leave Group button, only if the user isn't the owner of the Group.
           Visibility(
             visible: findMemberWithUID(_auth.currentUser!.uid) != null,
             child: ElevatedButton(
               onPressed: (){
-                //TODO: add confirmation dialog
+                //Remove the member from both the group in the Firestore document
+                //and from the group in Flutter. Then, removes the GroupWidget from the display.
                 GetIt.instance<RepositoryService>().removeMember(_auth.currentUser!.uid, widget.group.group_id).then((_) {
                   setState(() {
                     members.removeWhere((member) =>
@@ -211,9 +212,11 @@ class _GroupWidgetState extends State<GroupWidget>{
               ),
             ),
           ) : 
+          //Disband Group button, only if the user is the owner of the Group.
           ElevatedButton(
             onPressed: (){
-              //TODO: add confirmation dialog
+              //Disband the group, which sets the group's active bool to false.
+              //Then, removes the GroupWidget from the display.
               GetIt.instance<RepositoryService>().disbandGroup(widget.group.group_id).then((_) {
                 setState(() {
                   widget.group.isActive = false;
@@ -235,21 +238,26 @@ class _GroupWidgetState extends State<GroupWidget>{
       ),
     );
   }
+
+  //Displays the list of members within a Container.
   Widget memberList(){
     return Container(
       color: Color.fromARGB(255, 10, 70, 94),
+      //A scroll view that contains information about each member.
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           children: members.map((profile) =>
             Row(
               children: [
+                //A profile container for the member that it pertains to (see listed_profile_container.dart)
                 ListedProfileContainer(profile: profile, isFromOtherPage: true, removeFriend: widget.removeFriend,),
                 SizedBox(width: 5),
                 (_auth.currentUser!.uid != profile.uid && _auth.currentUser!.uid == owner!.uid) ?
+                //Remove Button, but only if the user is the owner and the
+                //user isn't "profile" when being mapped.
                 ElevatedButton(
                   onPressed: (){
-                    //TODO: add confirmation dialog
                     GetIt.instance<RepositoryService>().removeMember(profile.uid!, widget.group.group_id).then((_) {
                     setState(() {
                       members.removeWhere((member) =>
@@ -268,7 +276,7 @@ class _GroupWidgetState extends State<GroupWidget>{
                       fontFamily: 'Mulish'
                     )
                   )
-                ) : Container()
+                ) : Container()//Display a Container if the member in question is the user who is the group owner.
               ],
             )
           ).toList(),
@@ -276,11 +284,14 @@ class _GroupWidgetState extends State<GroupWidget>{
       ),
     );
   }
+
+  //Displays a Widget that allows the group owner to invite friends.
   Widget inviteFriendsPopUp(){
     return Container(
       color:Color.fromARGB(255, 10, 70, 94),
       child: Column(
         children: [
+          //BackButton which removes the GroupWidget from the display.
           Container(
             alignment: Alignment.topLeft,
             child: BackButton(
@@ -289,6 +300,7 @@ class _GroupWidgetState extends State<GroupWidget>{
               },
             ),
           ),
+          //Invite Friends Label
           Text("Invite Friends",
             style: TextStyle(
               fontFamily: "Mulish",
@@ -297,14 +309,18 @@ class _GroupWidgetState extends State<GroupWidget>{
               color: Colors.black
             )
           ),
+          //Scroll View which displays friends of the group owner.
           SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
+              //Maps each friend to a Row of widgets.
               children: widget.friends.map((friend) =>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    //A profile container for the member that it pertains to (see listed_profile_container.dart)
                     ListedProfileContainer(profile: friend, isFromOtherPage: true, removeFriend: widget.removeFriend,),
+                    //Invite button which stores a group invite notification into Firestore.
                     ElevatedButton(
                       onPressed: (){
                         DocumentReference groupRef = FirebaseFirestore.instance.doc("group/${widget.group.group_id}");

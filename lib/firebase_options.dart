@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
+//Note from author of this project: Below is a pre-provided comment from using
+//FlutterFire CLI.
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
@@ -15,6 +17,7 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class DefaultFirebaseOptions {
+  //returns the FirebaseOptions for the currentPlatform.
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       return web;
@@ -46,6 +49,7 @@ class DefaultFirebaseOptions {
     }
   }
 
+  //Web FirebaseOptions
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBh6-v_Es-2lzOza_yLmsQu_mkb-3FQOgc',
     appId: '1:1026053522641:web:fd9695400a1e6bc024f1f0',
@@ -56,6 +60,7 @@ class DefaultFirebaseOptions {
     measurementId: 'G-RYVM2H3TF5',
   );
 
+  //Android FirebaseOptions
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDFc6thmysVQpndomi9dWazT1CpRJ_5Cfc',
     appId: '1:1026053522641:android:e00c0fdb85c9084224f1f0',
@@ -64,6 +69,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'groupfly-a90ae.appspot.com',
   );
 
+  //iOS FirebaseOptions
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAZ-2or2qLcNRmVmNlhpc60ak0AfBxTIzs',
     appId: '1:1026053522641:ios:b7f959abf61d371f24f1f0',

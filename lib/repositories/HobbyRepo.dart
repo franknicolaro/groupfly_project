@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groupfly_project/DAOs/HobbyDAO.dart';
 import 'package:groupfly_project/models/Hobby.dart';
-import 'package:groupfly_project/services/authorization_service.dart';
 
+//Implementation of HobbyDAO
 class HobbyRepo implements HobbyDao{
+  //Instance of Firestore
   final FirebaseFirestore firebaseDB = FirebaseFirestore.instance;
-  final _auth = Authorization();
+
+  //List of selectable hobbies for registration.
   static final List<Hobby> _selectableHobbies = [
     Hobby(hobbyName: "Singing"),
     Hobby(hobbyName: "Dancing"),
@@ -23,6 +25,7 @@ class HobbyRepo implements HobbyDao{
     Hobby(hobbyName: "Painting"),
   ];
 
+  //Inserts hobbies into the hobby collection.
   @override
   Future<void> insertHobbies(List<Hobby> selectedHobbies) {
     var batch = firebaseDB.batch();
@@ -37,6 +40,7 @@ class HobbyRepo implements HobbyDao{
     return batch.commit().catchError((error) => print("Error occurred while commiting the batch of hobbies: $error"));
   }
   
+  //Returns all selectable hobbies.
   @override
   List<Hobby> getAllHobbies() {
     return _selectableHobbies;

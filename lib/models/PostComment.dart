@@ -1,3 +1,4 @@
+//PostComment model, used to structure and retrieve data easier in Post Repository.
 class PostComment{
   String text;
   String user_uid;

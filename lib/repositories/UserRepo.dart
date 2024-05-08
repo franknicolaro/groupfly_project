@@ -4,9 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/authorization_service.dart';
 
+//Implementation of UserDAO
 class UserRepo implements UserDao{
+  //Instance of Firestore
   final FirebaseFirestore firebaseDB = FirebaseFirestore.instance;
+
+  //Authorization object for inserting a new user into the users collection
   final _auth = Authorization();
+
+  //Gets a user by the provided UID
   @override
   Future<GroupFlyUser> getGroupFlyUserByUID(String uid) async {
     GroupFlyUser? result;
@@ -19,6 +25,8 @@ class UserRepo implements UserDao{
     result = documentSnapshot.data();
     return result!;
   }
+
+  //Gets a user by the provided username
   @override
   Future<List<GroupFlyUser>> searchProfileByName(String name) async{
     List<GroupFlyUser> profiles = [];
@@ -43,6 +51,7 @@ class UserRepo implements UserDao{
     return profiles;
   }
 
+  //Inserts a new user to the user collection after registration.
   @override
   Future<void> insertGroupFlyUser(String email, String address, DateTime? dateOfBirth, String username) {
     CollectionReference users = firebaseDB.collection('user');
@@ -59,6 +68,7 @@ class UserRepo implements UserDao{
     .catchError((error) => print("Error occurred while adding user: $error"));
   }
   
+  //Deactivates the user at a specified UID.
   @override
   Future<void> deactivateUser(String uid) async{
     firebaseDB.collection('user').doc(uid).update({
@@ -66,6 +76,7 @@ class UserRepo implements UserDao{
     });
   }
   
+  //Activates the user at a specified UID.
   @override
   Future<void> activateUser(String uid) async {
     firebaseDB.collection('user').doc(uid).update({

@@ -9,8 +9,10 @@ import '../../models/Group.dart';
 import '../../models/Hobby.dart';
 import '../../services/repository_service.dart';
 
+//Displays the groups of the user and allows 
+//for the user to create groups.
 class MyGroupsWidget extends StatefulWidget{
-  //TODO: REFACTOR: Pass groups through here
+  //List of friends and removeFriend function from AppController
   List<GroupFlyUser> friends;
   Function removeFriend;
   MyGroupsWidget({super.key, required this.friends, required this.removeFriend});
@@ -20,20 +22,16 @@ class MyGroupsWidget extends StatefulWidget{
 }
 
 class _MyGroupsWidgetState extends State<MyGroupsWidget>{
+  //Authorization service to get the groups of the owner.
   final Authorization _auth = Authorization();
-  final ValidationService _validation = ValidationService();
-  List<Group> groups = [];
-  final _formKey = GlobalKey<FormState>();
-  List<Hobby> selectableHobbies = [];
 
-  /*Needs:
-    Title
-    Hobby
-    Location
-    Date
-    Max Capacity
-    Other Notes
-  */
+  //Validation service for group creation.
+  final ValidationService _validation = ValidationService();
+  List<Group> groups = [];                //Groups that the user is a member of.
+  final _formKey = GlobalKey<FormState>();//Key for the group creation form.
+  List<Hobby> selectableHobbies = [];     //List of Hobbies that are selectable for the group creation form.
+
+  //Other variables for the group creation form.
   String title = '';
   String? hobbyName;
   String location = '';
@@ -49,6 +47,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
     selectableHobbies = GetIt.instance<RepositoryService>().getAllHobbies();
   }
 
+  //Initializes the groups based on the current user's UID.
   void initGroups(){
     GetIt.instance<RepositoryService>().getGroupsByMemberUID(_auth.currentUser!.uid).then((userGroups) {
       setState(() {
@@ -56,21 +55,14 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
       });
     });
   }
-  /*Column:
-      Label saying "My Groups"
-      Container()
-        SingleChildScroll of all groups user is a part of
-      Create Group Button
-        opens bottom modal sheel to create group
-          provide a form maybe for all of the details 
-          of the group instead of separate input fields.
-          might make it look cleaner.
-  */
+
+  //Builds the MyGroupsWidget
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         children: [
+          //Title for MyGroupsWidget.
           Text("My Groups",
             style: TextStyle(
               color: Colors.black,
@@ -79,6 +71,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
               fontFamily: 'Mulish'
             ),
           ),
+          //List of ListedGroupContainers.
           Container(
             width: MediaQuery.of(context).size.width * 0.5,
             height: MediaQuery.of(context).size.height * 0.4,
@@ -90,6 +83,8 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
               )
             )
           ),
+          //Button to create a group. Upon 
+          //clicking, the group creation form is displayed.
           ElevatedButton(
             onPressed: (){
               showModalBottomSheet(
@@ -112,6 +107,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
     );
   }
 
+  //Displays a DatePicker, which is a more clean way to retrieve the date.
   Future<DateTime> _showDatePicker()async {
     DateTime selectedDate = DateTime.now();
     await showDatePicker(
@@ -140,19 +136,13 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
     return selectedDate;
   }
 
-  /*Needs:
-    Title
-    Hobby
-    Location
-    Date
-    Max Capacity
-    Other Notes
-  */
+  //Returns the group creation form. 
   Widget displayGroupCreation(){
     return Container(
       color: Color.fromARGB(255, 10, 70, 94),
       child: Column(
         children: [
+          //Back button to remove the group creation form from display.
           Container(
             alignment: Alignment.topLeft,
             child: BackButton(
@@ -161,10 +151,12 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
               },
             )
           ),
+          //Form for group creation
           Form(
             key: _formKey,
             child: Column(
               children: [
+                //Title field with label
                 const Text("Title", 
                   style: TextStyle(
                     color: Colors.black,
@@ -181,6 +173,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     });
                   }
                 ),
+                //Hobby field with a selection scroll view.
                 Text(hobbyName == null ? "Hobby (Shift + scroll if using a mouse)" : "Selected Hobby: ${hobbyName}", 
                   style: const TextStyle(
                     color: Colors.black,
@@ -195,6 +188,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     children: selectableHobbies.map((hobby) =>
                       OutlinedButton(
                         onPressed: (){
+                          //Take the button clicked and set hobbyName to the selected hobby.
                           setState(() {
                             hobbyName = hobby.hobbyName;
                           });
@@ -217,6 +211,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     ).toList()
                   )
                 ),
+                //Location label with TextField
                 const Text("Location (Address or Landmark Title)", 
                   style: TextStyle(
                     color: Colors.black,
@@ -233,6 +228,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     });
                   }
                 ),
+                //Date and Time label
                 const Text("Date and Time", 
                   style: TextStyle(
                     color: Colors.black,
@@ -243,9 +239,11 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                 ),
                 Row(
                   children: [
+                    //Button to choose the Date and time.
                     ElevatedButton(
                       onPressed: () async { 
                         meetingTimeToDisplay = await _showDatePicker();
+                        //After displaying the date picker and selecting a time, set the meeting time to the display.
                         setState(() {
                           meetingTime = meetingTimeToDisplay;
                         });
@@ -261,6 +259,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                       ),
                     ),
                     SizedBox(width: 15,),
+                    //Label to display the selected date.
                     Text("SelectedDate: ${meetingTimeToDisplay != null ? meetingTimeToDisplay.toString() : "None"}",
                       style: const TextStyle(
                         color: Colors.black,
@@ -271,6 +270,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     )
                   ],
                 ),
+                //Maximum Capacity label with its respective TextField.
                 const Text("Maximum Capacity", 
                   style: TextStyle(
                     color: Colors.black,
@@ -287,6 +287,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     });
                   }
                 ),
+                //Other notes label with its respective TextField
                 const Text("Other Notes", 
                   style: TextStyle(
                     color: Colors.black,
@@ -301,9 +302,12 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                     otherNotes = value;
                   }
                 ),
+                //Button to create the group.
                 ElevatedButton(
                   onPressed: () async {
                     _formKey.currentState!.save();
+                    //If the group is validated, create a
+                    //Group object and insert the Group into Firestore.
                     if(_formKey.currentState!.validate() && hobbyName != null && meetingTime != null){
                       Group groupToInsert = Group(
                         group_id: '', 
@@ -322,6 +326,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                           groups.add(groupToInsert);
                         });
                       });
+                      //Reset all variables and remove the creation form from the display
                       setState(() {
                         hobbyName = null;
                         location = '';

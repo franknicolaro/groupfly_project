@@ -2,40 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
 
-import '../../models/FriendList.dart';
 import '../../models/Group.dart';
 import '../../models/Hobby.dart';
 import '../../services/repository_service.dart';
 import '../GroupWidgets/listed_group_container.dart';
 
+//A widget that displays the search bar and filters for 
+//Finding a group.
 class GroupExplorerWidget extends StatefulWidget{
-  List<GroupFlyUser> friendList;
-  Function removeFriend;
+  List<GroupFlyUser> friendList;  //Current user's friendList.
+  Function removeFriend;          //Function from AppController.
   GroupExplorerWidget({super.key, required this.friendList, required this.removeFriend});
   @override
   State<GroupExplorerWidget> createState() => _GroupExplorerWidgetState();
 }
 
 class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
+  //Searched goups, groups to be removed based on filters,
+  //and the former search results before the filters were applied.
   List<Group> groups = [];
   List<Group> formerSearchResults = [];
   List<Group> groupsToRemove = [];
+
+  //Filter variables to be applied to searched groups.
   String? hobbyFilter;
   String? locationFilter;
+  DateTime? meetingTimeFilter;
+  late int maxCapacityFilter;
+
+  //Temporary variables to keep track of labels.
   DateTime? tempDate;
   DateTime? tempDateToDisplay;
   String? selectedHobby;
-  DateTime? meetingTimeFilter;
-  late int maxCapacityFilter;
+
+  //Constants for default variables.
   final int DEFAULT_MAX_CAPACITY = -1;
   final String DEFAULT_HOBBY = '';
   final DateTime DEFAULT_DATE = DateTime.now();
   final String DEFAULT_LOCATION = '';
+
+  //Text controllers
   var _groupExplorerController = TextEditingController();
   var _locationController = TextEditingController();
   var _maxCapacityController = TextEditingController();
+
+  //Selectable Hobbies.
   List<Hobby> selectableHobbies = [];
 
+  //Initializes the filters and selectable hobbies.
   @override
   void initState(){
     super.initState();
@@ -46,9 +60,12 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
     selectableHobbies = GetIt.instance<RepositoryService>().getAllHobbies();
   }
 
+  //Calls to removeFriend from AppController.
   void removeFriend(String uid){
     widget.removeFriend(uid);
   }
+
+  //Returns a search bar for Groups, and a resultant list of groups in a scroll view.
   @override
   Widget build(BuildContext context){
     return Center(
@@ -57,6 +74,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              //Search bar for Groups
               Container(
                 width: MediaQuery.of(context).size.width * 0.45,
                 child: TextField(
@@ -67,6 +85,11 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                     suffixIcon: IconButton(
                       icon: Icon(Icons.search_rounded),
                       onPressed: (){
+                        //Checks if the groupExplorerController is not empty.
+                        //If it is not empty, search for groups that are equivalent to what was entered.
+                        //For each group that is returned, add that to the groups that
+                        //are displayed (implemented below). After this, add all groups
+                        //to the former search results before applying filters and clear the controller.
                         if(_groupExplorerController.text.isNotEmpty){
                           GetIt.instance<RepositoryService>().searchGroupsByName(_groupExplorerController.text).then((value) {
                             setState(() {
@@ -84,6 +107,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                 ),
               ),
               SizedBox(width: 10),
+              //Filters button that displays a Filters Widget
               ElevatedButton(
                 onPressed:() {
                   showModalBottomSheet(
@@ -102,6 +126,8 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                 )
               ),
               SizedBox(width: 10),
+              //Button to clear the filters that were applied, and resets the groups
+              //variable to normal if necessary.
               ElevatedButton(
                 onPressed:() {
                   setState(() {
@@ -124,6 +150,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
               )
             ],
           ),
+          //The resulting groups from performing the search.
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -138,6 +165,8 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
       ),
     );
   }
+  //Checks for each group if the filters apply to that group.
+  //if any filter does not apply, return false. Otherwise, return true.
   bool doFiltersApply(Group group){
     bool result = true;
     if(hobbyFilter != DEFAULT_HOBBY && hobbyFilter != group.hobbyName){
@@ -154,15 +183,18 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
     }
     return result;
   }
+
+  //Checks if the date matches by day, month, and year. Returns false if any
+  //of these do not match, and true if they all match.
   bool dateMatches(DateTime selectedDate){
-    
     bool result = false;
     if(meetingTimeFilter != null && meetingTimeFilter!.day == selectedDate.day && meetingTimeFilter!.month == selectedDate.month && meetingTimeFilter!.year == selectedDate.year){
-      print("Applies to ${selectedDate.toString()}");
       result = true;
     }
     return result;
   }
+
+  //Displays the "DatePicker", a much simpler way to select the date.
   Future<DateTime> _showDatePicker()async {
     DateTime selectedDate = DateTime.now();
     await showDatePicker(
@@ -175,12 +207,17 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
     });
     return selectedDate;
   }
+
+  //A function which returns the filters widget.
   Widget displayFiltersWidget(){
     return Center(
       child: Container(
         color: Color.fromARGB(255, 17, 127, 171),
         child: Column(
           children: [
+            //BackButton to ensure that the filters widget
+            //can be removed and the GroupExplorerWidget can
+            //be displayed.
             Container(
               alignment: Alignment.topLeft,
               child: BackButton(
@@ -189,6 +226,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                 }
               )
             ),
+            //Address TextField
             TextField(
               controller: _locationController,
               decoration: InputDecoration(
@@ -204,6 +242,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
             ),
             Row(
               children: [
+                //Button to select the date.
                 ElevatedButton(
                   onPressed: () async { 
                     tempDate = await _showDatePicker();
@@ -222,6 +261,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                   ),
                 ),
                 SizedBox(width: 15),
+                //Text which displays the selected date.
                 Text("Selected Date: ${tempDateToDisplay != null ? tempDateToDisplay.toString() : "None."}",
                   style: const TextStyle(
                     color: Colors.white,
@@ -232,11 +272,15 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                 ),
               ],
             ),
+            //Text to display the selected hobby.
             Text(selectedHobby == null ? "Select a hobby to filter by (Shift + scroll if using a mouse)" : "Selected Hobby: ${selectedHobby}"),
+            //A scroll view of the selectable hobbies.
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: selectableHobbies.map((hobby) =>
+                  //Clicking on the OutlinedButton of a hobby
+                  //sets the selectedHobby to that hobby name.
                   OutlinedButton(
                     onPressed: (){
                       setState(() {
@@ -261,6 +305,7 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                 ).toList()
               )
             ),
+            //TextField for maximum capacity of the group.
             TextField(
               keyboardType: TextInputType.number,
               controller: _maxCapacityController,
@@ -275,9 +320,11 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                 )
               ),
             ),
+            //Button for Applying filters.
             ElevatedButton(
               onPressed: () {
                 setState(() {
+                  //first check if anything isn't null or empty.
                   if(_maxCapacityController.text.isNotEmpty){
                     maxCapacityFilter = int.parse(_maxCapacityController.text);
                   }
@@ -290,6 +337,9 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                   if(selectedHobby != null){
                     hobbyFilter = selectedHobby;
                   }
+
+                  //Check if all filters apply to each group in the searched groups,
+                  //and add that group to the groupsToRemove if the filters do not apply.
                   groups.forEach((group) {
                     if(!doFiltersApply(group)){
                       setState(() {
@@ -297,6 +347,8 @@ class _GroupExplorerWidgetState extends State<GroupExplorerWidget>{
                       });
                     }
                   });
+                  //Remove groups where the groupsToRemoveList contains the given group,
+                  //then clear both controllers for the next time filters are applied.
                   groups.removeWhere((group) => groupsToRemove.contains(group));
                   _locationController.clear();
                   _maxCapacityController.clear();

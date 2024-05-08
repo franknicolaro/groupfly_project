@@ -5,10 +5,11 @@ import 'package:groupfly_project/services/repository_service.dart';
 
 import '../../models/group_fly_user.dart';
 
+//Class for a friend request notification.
 class FriendRequestWidget extends StatefulWidget{
-  GroupFlyNotification notification;
-  GroupFlyUser user;
-  Function removeNotification;
+  GroupFlyNotification notification;  //The notification
+  GroupFlyUser user;                  //The user that the notification refers to.
+  Function removeNotification;        //The removeNotification function passed from AppController.
   FriendRequestWidget({required this.notification, required this.user, required this.removeNotification});
 
   @override
@@ -16,6 +17,7 @@ class FriendRequestWidget extends StatefulWidget{
 }
 
 class _FriendRequestWidgetState extends State<FriendRequestWidget>{
+  //Builds the FriendRequestWidget.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,6 +26,7 @@ class _FriendRequestWidgetState extends State<FriendRequestWidget>{
         child: Column(
           children: [
             Container(
+              //BackButton to remove FriendRequestWidget from display
               alignment: Alignment.topLeft,
               child: BackButton(
                 onPressed: (){
@@ -31,8 +34,9 @@ class _FriendRequestWidgetState extends State<FriendRequestWidget>{
                 },
               )
             ),
-            SizedBox(width: 15), //TODO: just get rid of this. it doesn't do anything bc of width.
-            Text("Friend Request",
+            const SizedBox(height: 15), 
+            //Friend Request title label.
+            const Text("Friend Request",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 48,
@@ -40,6 +44,7 @@ class _FriendRequestWidgetState extends State<FriendRequestWidget>{
                 fontFamily: 'Mulish'
               )
             ),
+            //The name of the user that wants to be the current user's friend.
             Text("${widget.user.username} wants to be your friend.",
               style: TextStyle(
                 color: Colors.black,
@@ -52,6 +57,8 @@ class _FriendRequestWidgetState extends State<FriendRequestWidget>{
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                //Accept button, which adds the user as a friend, 
+                //then removes the notification and removes the FriendRequestWidget from display.
                 ElevatedButton(
                   onPressed: (){
                     GetIt.instance<RepositoryService>().addFriend(widget.notification.requesterUid, widget.notification.requesteeUid).then((_){
@@ -67,6 +74,8 @@ class _FriendRequestWidgetState extends State<FriendRequestWidget>{
                     )
                   )
                 ),
+                //Deny button, which denies the request, 
+                //then removes the notification and removes the FriendRequestWidget from display.
                 ElevatedButton(
                   onPressed: (){
                     GetIt.instance<RepositoryService>().removeNotification(widget.notification).then((_){

@@ -6,27 +6,25 @@ import 'package:groupfly_project/widgets/ProfileWidgets/general_profile_widget.d
 import '../../models/FriendList.dart';
 import '../SettingsWidgets/settings_widget.dart';
 
+//A class which displays the current user's profile page.
 class UserProfileWidgetWeb extends StatefulWidget {
-  GroupFlyUser user;
-  FriendList friends;
-  Function removeFriend;
-  List<GroupFlyNotification> notifications;
-  UserProfileWidgetWeb({required this.user, required this.friends, required this.removeFriend, required this.notifications});
+  GroupFlyUser user;                        //The current user.
+  FriendList friends;                       //The current user's FriendList
+  Function removeFriend;                    //The removeFriend function from AppController.
+  UserProfileWidgetWeb({required this.user, required this.friends, required this.removeFriend});
   @override
   State<UserProfileWidgetWeb> createState() => _UserProfileWidgetWebState();
 }
 
 class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
-  @override
-  void initState(){
-    super.initState();
-  }
-
+  //Refreshes the UI by calling setState().
   void refresh(){
     setState(() {
       
     });
   }
+
+  //Builds UserProfileWidgetWeb
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -35,6 +33,7 @@ class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
         backgroundColor: Color.fromARGB(255, 61, 111, 67),
         title: Text('User Profile'),
         actions:[
+          //Icon that displays the Settings when clicked on.
           TextButton.icon(
             onPressed:(){
               showModalBottomSheet(
@@ -48,10 +47,12 @@ class _UserProfileWidgetWebState extends State<UserProfileWidgetWeb>{
           ),
         ]
       ),
+      //Holds the current user's GeneralProfileWidget as the body of the Scaffold.
       body: GeneralProfileWidget(user: widget.user, isFromOtherPage: false, isCurrentUserFriend: false, friends: widget.friends, removeFriend: widget.removeFriend,)
     );
   }
 
+  //Returns the SettingsWidget.
   Widget settingsPopUp(){
     return SettingsWidget();
   }

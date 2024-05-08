@@ -1,31 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:groupfly_project/models/group_fly_user.dart';
 
-import '../../models/FriendList.dart';
 import '../../models/Group.dart';
 import 'group_widget.dart';
 
+//Displays a simple container of basic information of the group.
 class ListedGroupContainer extends StatefulWidget{
-  Group group;
-  List<GroupFlyUser> friends;
-  Function removeFriend;
+  Group group;                //The group that correlates to the Widget to be displayed.
+  List<GroupFlyUser> friends; //The list of friends
+  Function removeFriend;      //removeFriend from AppController
   ListedGroupContainer({required this.group, required this.friends, required this.removeFriend});
   @override
   State<ListedGroupContainer> createState() => _ListedGroupContainerState();
 }
 
 class _ListedGroupContainerState extends State<ListedGroupContainer>{
+  //A method which updates the UI of the container.
   void refresh(){
     setState(() {});
   }
-  void removeFriend(){
-    widget.removeFriend();
-  }
+
+  //Builds the ListedGroupContainer.
   @override
   Widget build(BuildContext context){
     return Column(
       children: [
         SizedBox(height: 18),
+        //Button which calls to a method which displays the 
+        //GroupWidget (see group_widget.dart) over the page that 
+        //this ListedGroupContainer is on.
         OutlinedButton(
           onPressed: (){
             showModalBottomSheet(
@@ -46,6 +49,7 @@ class _ListedGroupContainerState extends State<ListedGroupContainer>{
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                //Group Title
                 Expanded(
                   child: Container(
                     alignment: Alignment.topLeft,
@@ -61,6 +65,7 @@ class _ListedGroupContainerState extends State<ListedGroupContainer>{
                     )
                   ),
                 ),
+                //Member Capacity
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
@@ -75,6 +80,7 @@ class _ListedGroupContainerState extends State<ListedGroupContainer>{
                     )
                   ),
                 ),
+                //Hobby pertained to the group.
                 Expanded(
                   child: Container(
                     alignment: Alignment.bottomLeft,
@@ -97,10 +103,11 @@ class _ListedGroupContainerState extends State<ListedGroupContainer>{
       ],
     );
   }
+  //Displays the GroupWidget, pertaining to the group of the ListedGroupContainer
   Widget displayGroupPage(){
     return Container(
       color: Color.fromARGB(255, 17, 127, 171),
-      child: GroupWidget(group: widget.group, notifyWidget: refresh, friends: widget.friends, removeFriend: removeFriend,)
+      child: GroupWidget(group: widget.group, notifyWidget: refresh, friends: widget.friends, removeFriend: widget.removeFriend,)
     );
   }
 }

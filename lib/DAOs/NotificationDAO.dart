@@ -1,7 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../models/GroupFlyNotification.dart';
 
+//Notification Data Access Object
 abstract class NotificationDao{
   Future<List<GroupFlyNotification>> getAllNotificationsByRequesteeUid(String requesteeUid);
   Future<void> removeNotification(GroupFlyNotification notification);

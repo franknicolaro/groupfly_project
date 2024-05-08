@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+//GroupFlyNotification model.
 class GroupFlyNotification{
   String docId;
   String requesterUid;

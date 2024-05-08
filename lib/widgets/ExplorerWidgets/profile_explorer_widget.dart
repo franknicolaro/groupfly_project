@@ -7,24 +7,31 @@ import 'package:groupfly_project/widgets/ProfileWidgets/listed_profile_container
 import '../../models/GroupFlyNotification.dart';
 import '../../services/repository_service.dart';
 
+//A search bar widget for profiles.
 class ProfileExplorerWidget extends StatefulWidget{
-  FriendList friendList;
-  List<GroupFlyNotification> notifications;
-  Function removeFriend;
+  FriendList friendList;                    //The list of friendUIDs
+  List<GroupFlyNotification> notifications; //List of notifications
+  Function removeFriend;                    //removeFriend function from AppController.
   ProfileExplorerWidget({super.key, required this.friendList, required this.notifications, required this.removeFriend});
   @override
   State<ProfileExplorerWidget> createState() => _ProfileExplorerWidgetState();
 }
 
 class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
+  //List of profiles as a result.
   List<GroupFlyUser> profiles = [];
+
+  //Controller for the profile search bar.
   var _profileExplorerController = TextEditingController();
 
+  //Refresh method to update the UI.
   void refresh(){
     setState(() {
       
     });
   }
+
+  //Builds the Scaffold for the Profile Explorer.
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -36,6 +43,7 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
       body: Center(
         child: Column(
           children: [
+            //TextField to search for profiles.
             TextField(
               controller: _profileExplorerController,
               decoration: InputDecoration(
@@ -44,6 +52,8 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search_rounded),
                   onPressed: (){
+                    //Checks if the controller field isn't empty, then searched for profiles
+                    //By the name entered. Then clears the controller.
                     if(_profileExplorerController.text.isNotEmpty){
                       GetIt.instance<RepositoryService>().searchProfileByName(_profileExplorerController.text).then((value) {
                         setState(() {
@@ -56,6 +66,7 @@ class _ProfileExplorerWidgetState extends State<ProfileExplorerWidget>{
                 )
               )
             ),
+            //List of Profile containers, returned from searching.
             Expanded(
               child: SingleChildScrollView(
                 child: Column(

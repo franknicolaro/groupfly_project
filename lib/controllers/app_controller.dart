@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:groupfly_project/models/Group.dart';
 import 'package:groupfly_project/models/GroupFlyNotification.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 import 'package:groupfly_project/widgets/ExplorerWidgets/profile_explorer_widget.dart';
@@ -21,19 +20,26 @@ class AppController extends StatefulWidget {
 }
 
 class _AppControllerState extends State<AppController>{
+  //Authorization service to getting user information.
   Authorization _auth = Authorization();
+
+  //Widgets to be initialized in IndexedStack and BottomNavigationBar.
   Widget? profileExplorer;
   Widget? groupNavigation;
   Widget? homeFeed;
   Widget? currentProfilePage;
-  GroupFlyUser? currentUser;
+
+  //Variables for indexing for IndexedStack.
   int? _currentPageIndex;
+  final int DEFAULT_PAGE = 2;
+
+  //Current user information
+  GroupFlyUser? currentUser;
   FriendList? friends;
   List<Post> mostRecentPosts = [];
   List<GroupFlyUser> friendList = [];
   List<GroupFlyNotification> userNotifications = [];
-  final int DEFAULT_PAGE = 2;
-  //TODO: get groups & posts of user here.
+  
 
   @override
   void initState(){
@@ -42,6 +48,7 @@ class _AppControllerState extends State<AppController>{
     _currentPageIndex = DEFAULT_PAGE;
   }
 
+  //Initializes user, then calls initInformationRelatedToUser.
   void initUser() async {
     await GetIt.instance<RepositoryService>().getGroupFlyUserByUID(_auth.currentUser!.uid).then((value) {
       setState(() {
@@ -52,6 +59,9 @@ class _AppControllerState extends State<AppController>{
       });
     },);
   }
+
+  //Initalizes information related to the active user. 
+  //If the user is inactive, this will not be called until the user reactivates. 
   void initInformationRelatedToUser() async{
     await GetIt.instance<RepositoryService>().getFriendsByUID(_auth.currentUser!.uid).then((list) {
       setState(() {
@@ -79,12 +89,14 @@ class _AppControllerState extends State<AppController>{
     },);
   }
 
+  //Removes the friend from current user's friends based on the uid passed.
   void removeFriend(String uid){
     setState(() {
       friends!.friend_uids.removeWhere((friendUid) => friendUid == uid);
     });
   }
 
+  //Removes the notification from the current user's notifications list.
   void removeNotification(GroupFlyNotification notification){
     setState(() {
       userNotifications.removeWhere((userNotification) => userNotification == notification);
@@ -93,22 +105,22 @@ class _AppControllerState extends State<AppController>{
   
   @override
   Widget build(BuildContext context) {
-    /*TODO: Cases:
-    *   5: Refactor
-    *     b: PUT ALL GENERAL QUERY STUFF HERE (i.e. groups by current user's uid, friends of current user's uid, posts)
-    *     b: anything that doesn't look right on web
-    *     c: improving the look a little
-    */
+    //Scaffold which holds the defined widgets from above
     return Scaffold(
+      //The body is defined based on if the user is active. If they are, display the IndexedStack
+      //as normal, which displays all defined widgets above.
       body: currentUser == null ? Text("Loading...") : currentUser!.active! ? IndexedStack(
         index: _currentPageIndex,
         children: [
           profileExplorer == null ? Text("Loading...") : profileExplorer!,
           groupNavigation == null ? Text("Loading...") : groupNavigation!,
           homeFeed == null ? Text("Loading...") : homeFeed!,
-          currentProfilePage == null ? Text("not yet loaded") : currentProfilePage!
+          currentProfilePage == null ? Text("Loading...") : currentProfilePage!
         ],
-      ) : Container(
+      ) : 
+      //If the user is not active, then display a Container which confirms if the user would like
+      //to reactivate their account. 
+      Container(
         alignment: Alignment.center,
         color:Color.fromARGB(255, 10, 70, 94),
         child: Column(
@@ -123,17 +135,20 @@ class _AppControllerState extends State<AppController>{
             ),
             Row(
               children: [
+                //Button to confirm reactivation, where the system obtains information related to the
+                //user and activates the user.
                 ElevatedButton(
                   onPressed: (){
-                      initInformationRelatedToUser();
-                      GetIt.instance<RepositoryService>().activateUser(currentUser!.uid!).then((value) {
-                        setState(() {
-                          currentUser!.reactivate();
-                        });
-                      },);
+                    GetIt.instance<RepositoryService>().activateUser(currentUser!.uid!).then((value) {
+                      setState(() {
+                        initInformationRelatedToUser();
+                        currentUser!.reactivate();
+                      });
+                    },);
                   }, 
                   child: const Text("Yes")
                 ),
+                //Button to deny reactivation, logging out the user.
                 SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: (){
@@ -146,6 +161,7 @@ class _AppControllerState extends State<AppController>{
           ],
         )
       ),
+      //BottomNavigationBar which is visible if there is an active user. 
       bottomNavigationBar: Visibility(
         visible: currentUser != null && currentUser!.active!,
         child: BottomNavigationBar(
@@ -153,6 +169,7 @@ class _AppControllerState extends State<AppController>{
           unselectedItemColor: Colors.black,
           showUnselectedLabels: true,
           currentIndex: _currentPageIndex!,
+          //Each of these show up as buttons to click on in the navigation bar.
           items:const [
             BottomNavigationBarItem(
               icon: Icon(
@@ -180,6 +197,7 @@ class _AppControllerState extends State<AppController>{
               label: "Profile"
             ),
           ],
+          //Switch the index of the current page to the new index.
           onTap: (newIndex) => setState(() {
             if(_currentPageIndex != newIndex){
               _currentPageIndex = newIndex;

@@ -14,7 +14,9 @@ import '../models/Group.dart';
 import '../models/Hobby.dart';
 import '../models/Post.dart';
 
+//Service class that connects Flutter to Firestore.
 
+//Abstract class with all methods for retrieving and modifying data.
 abstract class RepositoryService{
   Future<GroupFlyUser> getGroupFlyUserByUID(String uid);
   Future<void> insertGroupFlyUser(String email, String password, DateTime? dateOfBirth, String username);
@@ -47,6 +49,10 @@ abstract class RepositoryService{
   Future<void> sendGroupInviteNotification(GroupFlyNotification notification);
 }
 
+//Implementation of abstract class. Each of these methods call
+//To their the repository which correlates to the data that is being
+//retrieved or modified. For this reason, comments explaining each of the methods
+//will be placed within their respective Repository classes.
 class RepositoryServiceImpl implements RepositoryService{
   @override
   Future<GroupFlyUser> getGroupFlyUserByUID(String uid) {

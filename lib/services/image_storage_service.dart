@@ -1,8 +1,9 @@
 import 'package:firebase_storage/firebase_storage.dart';
 
+//Service for retrieving images from FirebaseStorage.
 class ImageStorageService{
-  final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  //Gets the URL for images from FirebaseStorage based on the reference provided.
   Future<String?> getImageUrlFromStorage(Reference ref) async{
     String? url;
     try{

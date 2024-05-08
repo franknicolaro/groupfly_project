@@ -5,9 +5,12 @@ import 'package:groupfly_project/widgets/GroupWidgets/my_groups_widget.dart';
 
 import '../../models/GroupFlyNotification.dart';
 
+//The navigation for the two group pages.
 class GroupNavigationWidget extends StatefulWidget{
+  //List of friends and notifications.
   List<GroupFlyUser> friends;
   List<GroupFlyNotification> notifications;
+  //removeFriend function from AppController.
   Function removeFriend;
   GroupNavigationWidget({required this.friends, required this.notifications, required this.removeFriend});
   @override
@@ -15,11 +18,15 @@ class GroupNavigationWidget extends StatefulWidget{
 }
 
 class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
+  //Widgets to be utilized in IndexedStack.
   Widget? groupExplorer;
   Widget? myGroups;
+
+  //Index variables.
   int? _currentGroupWidgetIndex;
   final int DEFAULT_WIDGET = 0;
 
+  //Initializes the current index as well as the widgets in the Indexed Stack
   @override
   void initState(){
     super.initState();
@@ -27,6 +34,8 @@ class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
     myGroups = MyGroupsWidget(friends: widget.friends, removeFriend: widget.removeFriend,);
     groupExplorer = GroupExplorerWidget(friendList: widget.friends, removeFriend: widget.removeFriend);
   }
+
+  //Builds the GroupNavigation widget.
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -35,6 +44,7 @@ class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
         backgroundColor: Color.fromARGB(255, 61, 111, 67),
         title: Text('Group Navigation'),
       ),
+      //IndexedStack that determines which widget is displayed.
       body: IndexedStack(
         index: _currentGroupWidgetIndex,
         children: [
@@ -42,6 +52,7 @@ class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
           groupExplorer == null ? Text("Loading...") : groupExplorer!
         ]
       ),
+      //BottomNavigationBar with the My Groups and Group Explorer icons.
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
@@ -63,6 +74,7 @@ class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
             label: "Group Explorer"
           ),
         ],
+        //Sets the current index to the new index depending on what was tapped.
         onTap: (newIndex) => setState(() {
           if(_currentGroupWidgetIndex != newIndex){
             _currentGroupWidgetIndex = newIndex;
