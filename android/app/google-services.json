@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1026053522641",
+    "project_id": "groupfly-a90ae",
+    "storage_bucket": "groupfly-a90ae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026053522641:android:e00c0fdb85c9084224f1f0",
+        "android_client_info": {
+          "package_name": "com.example.groupfly_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFc6thmysVQpndomi9dWazT1CpRJ_5Cfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
