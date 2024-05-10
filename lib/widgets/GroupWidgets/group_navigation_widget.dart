@@ -3,16 +3,19 @@ import 'package:groupfly_project/models/group_fly_user.dart';
 import 'package:groupfly_project/widgets/ExplorerWidgets/group_explorer_widget.dart';
 import 'package:groupfly_project/widgets/GroupWidgets/my_groups_widget.dart';
 
+import '../../models/Group.dart';
 import '../../models/GroupFlyNotification.dart';
 
 //The navigation for the two group pages.
 class GroupNavigationWidget extends StatefulWidget{
-  //List of friends and notifications.
+  //List of friends, groups and notifications.
   List<GroupFlyUser> friends;
   List<GroupFlyNotification> notifications;
-  //removeFriend function from AppController.
+  List<Group> groups;
+  //removeFriend and addGroup functions from AppController.
   Function removeFriend;
-  GroupNavigationWidget({required this.friends, required this.notifications, required this.removeFriend});
+  Function addGroup;
+  GroupNavigationWidget({required this.friends, required this.notifications, required this.removeFriend, required this.groups, required this.addGroup});
   @override
   State<GroupNavigationWidget> createState() => _GroupNavigationWidgetState();
 }
@@ -31,7 +34,7 @@ class _GroupNavigationWidgetState extends State<GroupNavigationWidget>{
   void initState(){
     super.initState();
     _currentGroupWidgetIndex = DEFAULT_WIDGET;
-    myGroups = MyGroupsWidget(friends: widget.friends, removeFriend: widget.removeFriend,);
+    myGroups = MyGroupsWidget(friends: widget.friends, removeFriend: widget.removeFriend, groups: widget.groups, addGroup: widget.addGroup,);
     groupExplorer = GroupExplorerWidget(friendList: widget.friends, removeFriend: widget.removeFriend);
   }
 

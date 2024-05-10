@@ -80,6 +80,7 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
             child: Column(
               children: [
                 //Email Label with TextField
+                //Note: Authorization service handles validation of email.
                 const SizedBox(height: 20.0),
                 const Text('Email', style: TextStyle(
                               color: Colors.white,
@@ -214,6 +215,8 @@ class _RegisterWidgetWebState extends State<RegisterWidgetWeb>{
                       //Then, switches view to VerifyAccountScreen
                       widget.setHobbies(_selectedHobbies);
                       await GetIt.instance<RepositoryService>().insertGroupFlyUser(email, address, dateOfBirth, username);
+                      await GetIt.instance<RepositoryService>().initFriendDocument(_auth.currentUser!.uid);
+                      await GetIt.instance<RepositoryService>().insertHobbies(_selectedHobbies);
                       widget.switchView("verify");
                     }
                   }, 

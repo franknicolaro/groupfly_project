@@ -60,9 +60,9 @@ class UserRepo implements UserDao{
       'address': address,
       'date_of_birth': dateOfBirth,
       'username': username,
-      'photo_url': null,
+      'photo_url': "",
       'home_feed_recency_in_days': 2,
-      'active': false
+      'active': true
     })
     .then((value) => print("User added at id ${_auth.currentUser!.uid}."))
     .catchError((error) => print("Error occurred while adding user: $error"));

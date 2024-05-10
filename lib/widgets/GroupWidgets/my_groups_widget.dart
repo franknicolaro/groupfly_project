@@ -12,10 +12,13 @@ import '../../services/repository_service.dart';
 //Displays the groups of the user and allows 
 //for the user to create groups.
 class MyGroupsWidget extends StatefulWidget{
-  //List of friends and removeFriend function from AppController
+  //List of friends and removeFriend function from AppController, as
+  //well as list of groups and addGroup function
   List<GroupFlyUser> friends;
+  List<Group> groups;
   Function removeFriend;
-  MyGroupsWidget({super.key, required this.friends, required this.removeFriend});
+  Function addGroup;
+  MyGroupsWidget({super.key, required this.friends, required this.removeFriend, required this.groups, required this.addGroup});
 
   @override
   State<MyGroupsWidget> createState() => _MyGroupsWidgetState();
@@ -27,6 +30,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
 
   //Validation service for group creation.
   final ValidationService _validation = ValidationService();
+  
   List<Group> groups = [];                //Groups that the user is a member of.
   final _formKey = GlobalKey<FormState>();//Key for the group creation form.
   List<Hobby> selectableHobbies = [];     //List of Hobbies that are selectable for the group creation form.
@@ -49,11 +53,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
 
   //Initializes the groups based on the current user's UID.
   void initGroups(){
-    GetIt.instance<RepositoryService>().getGroupsByMemberUID(_auth.currentUser!.uid).then((userGroups) {
-      setState(() {
-        groups = userGroups;
-      });
-    });
+    groups = widget.groups;
   }
 
   //Builds the MyGroupsWidget
@@ -221,7 +221,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                   )
                 ),
                 TextFormField(
-                  validator: (value) => value!.isEmpty ? 'Enter a location' : null,
+                  validator: (value) => _validation.validAddress(value!) ? 'Enter a location' : null,
                   onChanged: (value){
                     setState(() {
                       location = value;
@@ -324,6 +324,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                       GetIt.instance<RepositoryService>().createGroup(groupToInsert).then((_) {
                         setState(() {
                           groups.add(groupToInsert);
+                          widget.addGroup(groupToInsert);
                         });
                       });
                       //Reset all variables and remove the creation form from the display

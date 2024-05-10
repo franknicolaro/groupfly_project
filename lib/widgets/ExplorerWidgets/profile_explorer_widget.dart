@@ -13,6 +13,7 @@ class ProfileExplorerWidget extends StatefulWidget{
   List<GroupFlyNotification> notifications; //List of notifications
   Function removeFriend;                    //removeFriend function from AppController.
   ProfileExplorerWidget({super.key, required this.friendList, required this.notifications, required this.removeFriend});
+
   @override
   State<ProfileExplorerWidget> createState() => _ProfileExplorerWidgetState();
 }

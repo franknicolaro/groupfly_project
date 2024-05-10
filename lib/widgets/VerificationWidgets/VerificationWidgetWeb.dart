@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:groupfly_project/services/authorization_service.dart';
 
 import '../../models/Hobby.dart';
-import '../../services/repository_service.dart';
 
 class VerificationWidgetWeb extends StatefulWidget{
   //Function and list of hobbies passed through from LoginController.
@@ -42,16 +40,11 @@ class _VerificationWidgetWebState extends State<VerificationWidgetWeb>{
   }
 
   //Function to confirm if the user is verified. If it is, then 
-  //stop the timer, activate the user,and initialize
-  //the user's friends document and hobbies document.
+  //stop the timer.
   Future<void> checkIfVerified() async {
     user = _auth.currentUser;
     await user?.reload();
     if(user != null && user!.emailVerified){
-      await GetIt.instance<RepositoryService>().activateUser(user!.uid);
-      await GetIt.instance<RepositoryService>().initFriendDocument(user!.uid);
-      await GetIt.instance<RepositoryService>().insertHobbies(widget.hobbies);
-      setState(() {});
       timer?.cancel();
     }
   }

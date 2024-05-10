@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:groupfly_project/services/validation_service.dart';
 
 import '../../services/authorization_service.dart';
 
@@ -14,6 +15,9 @@ class LoginWidgetWeb extends StatefulWidget{
 class _LoginWidgetWebState extends State<LoginWidgetWeb>{
   //Authorization Service to allow for the login of the user.
   final Authorization _auth = Authorization();
+
+  //Validation Service to determine if the password is valid.
+  final ValidationService _validationService = ValidationService();
 
   //Key to keep track of data in form.
   final _formKey = GlobalKey<FormState>();
@@ -61,6 +65,7 @@ class _LoginWidgetWebState extends State<LoginWidgetWeb>{
           child: Column(
             children: [
               //Email Label with TextField
+              //Note: Authorization service handles validation of email.
               const SizedBox(height: 20.0),
               const Text('Email', style: TextStyle(
                             color: Colors.white,
@@ -86,7 +91,7 @@ class _LoginWidgetWebState extends State<LoginWidgetWeb>{
               const SizedBox(height: 10.0),
               TextFormField(
                 obscureText: true,
-                validator: (value) => value!.length < 6 ? 'Enter a password with 6+ characters' : null,
+                validator: (value) => _validationService.validPassword(value!) ? 'Enter a password with 6+ characters' : null,
                 onChanged: (value){
                   setState(() => password = value);
                 }

@@ -6,6 +6,7 @@ import 'package:groupfly_project/widgets/ExplorerWidgets/profile_explorer_widget
 import 'package:groupfly_project/widgets/GroupWidgets/group_navigation_widget.dart';
 
 import '../models/FriendList.dart';
+import '../models/Group.dart';
 import '../models/Post.dart';
 import '../models/group_fly_user.dart';
 import '../screens/profile_screen.dart';
@@ -29,6 +30,9 @@ class _AppControllerState extends State<AppController>{
   Widget? homeFeed;
   Widget? currentProfilePage;
 
+  //Global Keys to call state methods from here.
+  //GlobalKey<profileExplorer> profileExplorerKey = GlobalKey();
+
   //Variables for indexing for IndexedStack.
   int? _currentPageIndex;
   final int DEFAULT_PAGE = 2;
@@ -39,6 +43,7 @@ class _AppControllerState extends State<AppController>{
   List<Post> mostRecentPosts = [];
   List<GroupFlyUser> friendList = [];
   List<GroupFlyNotification> userNotifications = [];
+  List<Group> groups = [];
   
 
   @override
@@ -73,16 +78,19 @@ class _AppControllerState extends State<AppController>{
         }
         GetIt.instance<RepositoryService>().getRecentPostsByFriendUIDs(currentUser!, friends!).then(
           (posts) {
-            GetIt.instance<RepositoryService>().getAllNotificationsByRequesteeUid(_auth.currentUser!.uid).then((notifications){
-              setState(() {
-                userNotifications = notifications;
-                mostRecentPosts = posts;
-                currentProfilePage = ProfileScreen(user: currentUser!, friends: friends!, removeFriend: removeFriend, notifications: userNotifications,);
-                homeFeed = HomeFeedWidget(user: currentUser!, mostRecentPosts: mostRecentPosts, notifications: userNotifications, removeNotification: removeNotification,);
-                groupNavigation = GroupNavigationWidget(friends: friendList, notifications: userNotifications, removeFriend: removeFriend,);
-                profileExplorer = ProfileExplorerWidget(friendList: friends!, notifications: userNotifications, removeFriend: removeFriend,);
-              });
-            }); 
+            GetIt.instance<RepositoryService>().getGroupsByMemberUID(currentUser!.uid!).then((obtianedGroups) {
+              GetIt.instance<RepositoryService>().getAllNotificationsByRequesteeUid(_auth.currentUser!.uid).then((notifications){
+                setState(() {
+                  groups = obtianedGroups;
+                  userNotifications = notifications;
+                  mostRecentPosts = posts;
+                  currentProfilePage = ProfileScreen(user: currentUser!, friends: friends!, removeFriend: removeFriend, notifications: userNotifications,);
+                  homeFeed = HomeFeedWidget(user: currentUser!, mostRecentPosts: mostRecentPosts, notifications: userNotifications, removeNotification: removeNotification,);
+                  groupNavigation = GroupNavigationWidget(friends: friendList, notifications: userNotifications, removeFriend: removeFriend, groups: groups, addGroup: addGroup,);
+                  profileExplorer = ProfileExplorerWidget(friendList: friends!, notifications: userNotifications, removeFriend: removeFriend,);
+                });
+              }); 
+            },);
           }
         );
       });
@@ -100,6 +108,13 @@ class _AppControllerState extends State<AppController>{
   void removeNotification(GroupFlyNotification notification){
     setState(() {
       userNotifications.removeWhere((userNotification) => userNotification == notification);
+    });
+  }
+
+  //Adds the group to the current user's groups.
+  void addGroup(Group group){
+    setState(() {
+      groups.add(group);
     });
   }
   

@@ -23,7 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
   @override
   Widget build(BuildContext context) {
     if(kIsWeb){
-      return UserProfileWidgetWeb(user: widget.user, friends: widget.friends, removeFriend: widget.removeFriend, notifications: widget.notifications,);
+      return UserProfileWidgetWeb(user: widget.user, friends: widget.friends, removeFriend: widget.removeFriend);
     }
     else{ 
       return Text("TODO: Implement Mobile Version");
