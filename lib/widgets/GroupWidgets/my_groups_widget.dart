@@ -221,7 +221,7 @@ class _MyGroupsWidgetState extends State<MyGroupsWidget>{
                   )
                 ),
                 TextFormField(
-                  validator: (value) => _validation.validAddress(value!) ? 'Enter a location' : null,
+                  validator: (value) => !_validation.validAddress(value!) ? 'Enter a location' : null,
                   onChanged: (value){
                     setState(() {
                       location = value;

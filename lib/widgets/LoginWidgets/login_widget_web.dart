@@ -91,7 +91,7 @@ class _LoginWidgetWebState extends State<LoginWidgetWeb>{
               const SizedBox(height: 10.0),
               TextFormField(
                 obscureText: true,
-                validator: (value) => _validationService.validPassword(value!) ? 'Enter a password with 6+ characters' : null,
+                validator: (value) => !_validationService.validPassword(value!) ? 'Enter a password with 6+ characters' : null,
                 onChanged: (value){
                   setState(() => password = value);
                 }
