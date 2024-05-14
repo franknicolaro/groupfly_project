@@ -77,7 +77,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget>{
                 const SizedBox(height: 10),
                 TextFormField(
                   obscureText: true,
-                  validator: (value) => _validation.validPassword(value!) ? 'Enter a new password that is 8+ characters, with uppercase, lowercase, and special characters' : null,
+                  validator: (value) => !_validation.validPassword(value!) ? 'Enter a new password that is 8+ characters, with uppercase, lowercase, and special characters' : null,
                   onChanged:(value) {
                     setState(() => newPassword = value);
                   },
